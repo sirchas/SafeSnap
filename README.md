@@ -50,6 +50,8 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 |---|---|
 | `SafeSnap-Setup-1.0.1.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
 | `SafeSnap-1.0.1-portable-win-x64.exe` | Portable single file. No install; just run it. |
+| `SafeSnap-Setup-1.0.1.zip` | The installer in a zip (with a short README.txt). |
+| `SafeSnap-1.0.1-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
