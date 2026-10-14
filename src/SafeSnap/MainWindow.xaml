@@ -6,7 +6,7 @@
     Title="SafeSnap"
     Width="1100"
     Height="720"
-    MinWidth="860"
+    MinWidth="920"
     MinHeight="520"
     WindowStartupLocation="CenterScreen"
     WindowBackdropType="Mica"
@@ -254,6 +254,57 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="ToolSegmentButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="28" />
+            <Setter Property="MinWidth" Value="28" />
+            <Setter Property="Margin" Value="1,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <Border
+                                    x:Name="Hover"
+                                    Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="6"
+                                    IsHitTestVisible="False"
+                                    Opacity="0" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Hover" Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Hover" Property="Opacity" Value="0.65" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.42" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Tag" Value="Selected">
+                    <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </ui:FluentWindow.Resources>
 
     <Grid x:Name="RootLayout" Background="{DynamicResource ControlFillColorDefaultBrush}">
@@ -317,6 +368,97 @@
                         </ContextMenu>
                     </ui:DropDownButton.Flyout>
                 </ui:DropDownButton>
+
+                <Rectangle
+                    Width="1"
+                    Height="22"
+                    Margin="8,0"
+                    Fill="{DynamicResource ControlElevationBorderBrush}" />
+
+                <Border
+                    x:Name="ToolPicker"
+                    Margin="2,0"
+                    Padding="2,2"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                    BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    SnapsToDevicePixels="True">
+                    <StackPanel Orientation="Horizontal">
+                        <Button
+                            x:Name="PixelateToolButton"
+                            Width="34"
+                            Click="PixelateTool_Click"
+                            Style="{StaticResource ToolSegmentButtonStyle}"
+                            Tag="Selected"
+                            ToolTip="Pixelate">
+                            <ui:SymbolIcon
+                                FontSize="16"
+                                Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                Symbol="Blur24" />
+                        </Button>
+                        <Button
+                            x:Name="HighlightToolButton"
+                            Width="34"
+                            Click="HighlightTool_Click"
+                            Style="{StaticResource ToolSegmentButtonStyle}"
+                            ToolTip="Highlight">
+                            <ui:SymbolIcon
+                                FontSize="16"
+                                Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                Symbol="Highlight24" />
+                        </Button>
+                        <Button
+                            x:Name="ArrowToolButton"
+                            Width="34"
+                            Click="ArrowTool_Click"
+                            Style="{StaticResource ToolSegmentButtonStyle}"
+                            ToolTip="Arrow">
+                            <ui:SymbolIcon
+                                FontSize="16"
+                                Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                Symbol="ArrowUpRight24" />
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    x:Name="ArrowSizeBand"
+                    Margin="6,0,2,0"
+                    Padding="2,2"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                    BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    SnapsToDevicePixels="True"
+                    Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <Button
+                            x:Name="ArrowSmallButton"
+                            Padding="8,0"
+                            Click="ArrowSmallButton_Click"
+                            Content="Small"
+                            Style="{StaticResource ToolSegmentButtonStyle}"
+                            ToolTip="Small" />
+                        <Button
+                            x:Name="ArrowMediumButton"
+                            Padding="8,0"
+                            Click="ArrowMediumButton_Click"
+                            Content="Medium"
+                            Style="{StaticResource ToolSegmentButtonStyle}"
+                            Tag="Selected"
+                            ToolTip="Medium" />
+                        <Button
+                            x:Name="ArrowLargeButton"
+                            Padding="8,0"
+                            Click="ArrowLargeButton_Click"
+                            Content="Large"
+                            Style="{StaticResource ToolSegmentButtonStyle}"
+                            ToolTip="Large" />
+                    </StackPanel>
+                </Border>
 
                 <Rectangle
                     Width="1"
@@ -456,6 +598,25 @@
                                 Stroke="#FF3B9EFF"
                                 StrokeThickness="2"
                                 Visibility="Collapsed" />
+                            <Path
+                                x:Name="ArrowShaftPreview"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                IsHitTestVisible="False"
+                                Stretch="None"
+                                Stroke="#FFE53935"
+                                StrokeEndLineCap="Flat"
+                                StrokeLineJoin="Miter"
+                                StrokeStartLineCap="Round"
+                                Visibility="Collapsed" />
+                            <Path
+                                x:Name="ArrowHeadPreview"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Fill="#FFE53935"
+                                IsHitTestVisible="False"
+                                Stretch="None"
+                                Visibility="Collapsed" />
                         </Grid>
                     </Border>
                 </Viewbox>
@@ -483,7 +644,7 @@
                 <Border Margin="-2,0,-2,-5" Background="#0B000000" CornerRadius="18" IsHitTestVisible="False" />
                 <Border
                     x:Name="PixelateTip"
-                    MaxWidth="480"
+                    MaxWidth="540"
                     Padding="14,12"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
@@ -523,12 +684,12 @@
                     </Border>
                     <TextBlock
                         Grid.Column="1"
-                        MaxWidth="280"
+                        MaxWidth="320"
                         VerticalAlignment="Center"
                         FontSize="13"
                         LineHeight="18"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="Tip: drag over anything you want to hide. It'll be pixelated."
+                        Text="Tip: drag to pixelate. Use the toolbar to switch to Highlight or Arrow."
                         TextWrapping="Wrap" />
                     <ui:Button
                         x:Name="PixelateTipGotIt"

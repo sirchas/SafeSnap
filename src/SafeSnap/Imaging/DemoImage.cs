@@ -67,6 +67,33 @@ public static class DemoImage
         return bitmap;
     }
 
+    /// <summary>
+    /// Adds one highlight and one arrow on top of the pixelated demo capture.
+    /// Used by the annotated screenshot mode.
+    /// </summary>
+    public static void ApplySampleAnnotations(WriteableBitmap bitmap)
+    {
+        if (bitmap is null)
+        {
+            throw new ArgumentNullException(nameof(bitmap));
+        }
+
+        var sx = bitmap.PixelWidth / (double)DesignWidth;
+        var sy = bitmap.PixelHeight / (double)DesignHeight;
+
+        var highlight = new Int32Rect(
+            (int)Math.Round(24 * sx),
+            (int)Math.Round(158 * sy),
+            Math.Max(1, (int)Math.Round(340 * sx)),
+            Math.Max(1, (int)Math.Round(54 * sy)));
+        Annotator.Highlight(bitmap, highlight);
+
+        var start = new Point(760 * sx, 188 * sy);
+        var end = new Point(400 * sx, 296 * sy);
+        var scale = Math.Max(1d, Math.Min(sx, sy));
+        Annotator.DrawArrow(bitmap, start, end, Annotator.Thickness(ArrowSize.Large) * scale);
+    }
+
     private static FormattedText Text(string value, double size, Brush brush, double pixelsPerDip)
     {
         return new FormattedText(

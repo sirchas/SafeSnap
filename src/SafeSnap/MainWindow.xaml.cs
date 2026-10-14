@@ -8,6 +8,12 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
     private const double ImageCornerRadius = 14;
     private const double WorkspaceMargin = 6;
+    private const double MinimumArrowDrag = 5;
+
+    private static readonly SolidColorBrush PixelateFillBrush = FrozenBrush(Color.FromArgb(0x33, 0x3B, 0x9E, 0xFF));
+    private static readonly SolidColorBrush PixelateStrokeBrush = FrozenBrush(Color.FromArgb(0xFF, 0x3B, 0x9E, 0xFF));
+    private static readonly SolidColorBrush HighlightFillBrush = FrozenBrush(Color.FromArgb(0x66, 0xFF, 0xE6, 0x00));
+    private static readonly SolidColorBrush HighlightStrokeBrush = FrozenBrush(Color.FromArgb(0xFF, 0xC4, 0x96, 0x00));
 
     private readonly EditHistory _history = new();
     private readonly bool _screenshotMode;
@@ -25,6 +31,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private bool _screenshotShadowFallback;
     private bool _arrangingShadow;
     private bool _exitRequested;
+    private EditorTool _tool = EditorTool.Pixelate;
+    private ArrowSize _arrowSize = ArrowSize.Medium;
 
     public MainWindow()
     {
@@ -53,6 +61,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             _tray = null;
         };
         UpdateChrome();
+        ApplyToolChrome();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -150,7 +159,9 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             if (!string.IsNullOrWhiteSpace(App.ScreenshotPath))
             {
                 HidePixelateTip();
-                SetImage(CreateWorkspaceDemoImage(), resetHistory: true);
+                var demo = CreateWorkspaceDemoImage();
+                DemoImage.ApplySampleAnnotations(demo);
+                SetImage(demo, resetHistory: true);
                 UpdateLayout();
                 await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 RenderWindowToPng(App.ScreenshotPath);
@@ -927,6 +938,67 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         e.Handled = true;
     }
 
+    private void PixelateTool_Click(object sender, RoutedEventArgs e)
+    {
+        SetTool(EditorTool.Pixelate);
+    }
+
+    private void HighlightTool_Click(object sender, RoutedEventArgs e)
+    {
+        SetTool(EditorTool.Highlight);
+    }
+
+    private void ArrowTool_Click(object sender, RoutedEventArgs e)
+    {
+        SetTool(EditorTool.Arrow);
+    }
+
+    private void ArrowSmallButton_Click(object sender, RoutedEventArgs e)
+    {
+        SetArrowSize(ArrowSize.Small);
+    }
+
+    private void ArrowMediumButton_Click(object sender, RoutedEventArgs e)
+    {
+        SetArrowSize(ArrowSize.Medium);
+    }
+
+    private void ArrowLargeButton_Click(object sender, RoutedEventArgs e)
+    {
+        SetArrowSize(ArrowSize.Large);
+    }
+
+    private void SetTool(EditorTool tool)
+    {
+        _tool = tool;
+        ApplyToolChrome();
+        if (_pixelDrag)
+        {
+            UpdateDragPreview();
+        }
+    }
+
+    private void SetArrowSize(ArrowSize size)
+    {
+        _arrowSize = size;
+        ApplyToolChrome();
+        if (_pixelDrag && _tool == EditorTool.Arrow)
+        {
+            UpdateDragPreview();
+        }
+    }
+
+    private void ApplyToolChrome()
+    {
+        PixelateToolButton.Tag = _tool == EditorTool.Pixelate ? "Selected" : null;
+        HighlightToolButton.Tag = _tool == EditorTool.Highlight ? "Selected" : null;
+        ArrowToolButton.Tag = _tool == EditorTool.Arrow ? "Selected" : null;
+        ArrowSmallButton.Tag = _arrowSize == ArrowSize.Small ? "Selected" : null;
+        ArrowMediumButton.Tag = _arrowSize == ArrowSize.Medium ? "Selected" : null;
+        ArrowLargeButton.Tag = _arrowSize == ArrowSize.Large ? "Selected" : null;
+        ArrowSizeBand.Visibility = _tool == EditorTool.Arrow ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     private void ImageHost_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (_current is null)
@@ -938,7 +1010,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         _pixelStart = e.GetPosition(ImageHost);
         _pixelCurrent = _pixelStart;
         ImageHost.CaptureMouse();
-        ShowPixelRect(_pixelStart, _pixelStart);
+        UpdateDragPreview();
         e.Handled = true;
     }
 
@@ -955,7 +1027,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             DismissPixelateTip();
         }
 
-        ShowPixelRect(_pixelStart, _pixelCurrent);
+        UpdateDragPreview();
         e.Handled = true;
     }
 
@@ -967,16 +1039,16 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         _pixelCurrent = e.GetPosition(ImageHost);
-        FinishPixelDrag();
+        FinishDrag();
         e.Handled = true;
     }
 
     private void ImageHost_LostMouseCapture(object sender, MouseEventArgs e)
     {
-        FinishPixelDrag();
+        FinishDrag();
     }
 
-    private void FinishPixelDrag()
+    private void FinishDrag()
     {
         if (!_pixelDrag)
         {
@@ -989,9 +1061,23 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             ImageHost.ReleaseMouseCapture();
         }
 
-        PixelateRect.Visibility = Visibility.Collapsed;
+        HideDragPreview();
         if (_current is null)
         {
+            return;
+        }
+
+        var bitmap = _current;
+        if (_tool == EditorTool.Arrow)
+        {
+            var start = ClampToImage(_pixelStart);
+            var end = ClampToImage(_pixelCurrent);
+            if (Distance(start, end) < MinimumArrowDrag)
+            {
+                return;
+            }
+
+            CommitEdit(() => Annotator.DrawArrow(bitmap, start, end, _arrowSize));
             return;
         }
 
@@ -1001,13 +1087,105 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             return;
         }
 
+        CommitEdit(() =>
+        {
+            if (_tool == EditorTool.Highlight)
+            {
+                Annotator.Highlight(bitmap, rect);
+            }
+            else
+            {
+                Pixelator.Pixelate(bitmap, rect);
+            }
+        });
+    }
+
+    private void CommitEdit(Action edit)
+    {
+        if (_current is null)
+        {
+            return;
+        }
+
         DismissPixelateTip();
         var snapshot = ImageUtility.Clone(_current);
-        Pixelator.Pixelate(_current, rect);
+        edit();
         _history.PushUndo(snapshot);
         CanvasImage.Source = null;
         CanvasImage.Source = _current;
         UpdateChrome();
+    }
+
+    private void UpdateDragPreview()
+    {
+        if (_tool == EditorTool.Arrow)
+        {
+            ShowArrowPreview(ClampToImage(_pixelStart), ClampToImage(_pixelCurrent));
+            return;
+        }
+
+        HideArrowPreview();
+        ShowPixelRect(_pixelStart, _pixelCurrent);
+    }
+
+    private void HideDragPreview()
+    {
+        PixelateRect.Visibility = Visibility.Collapsed;
+        HideArrowPreview();
+    }
+
+    private void HideArrowPreview()
+    {
+        ArrowShaftPreview.Visibility = Visibility.Collapsed;
+        ArrowHeadPreview.Visibility = Visibility.Collapsed;
+    }
+
+    private void ShowArrowPreview(Point start, Point end)
+    {
+        PixelateRect.Visibility = Visibility.Collapsed;
+        if (Distance(start, end) < 1)
+        {
+            HideArrowPreview();
+            return;
+        }
+
+        var thickness = Annotator.Thickness(_arrowSize);
+        var head = Annotator.CreateArrowhead(start, end, thickness);
+        var triangle = new StreamGeometry();
+        using (var ctx = triangle.Open())
+        {
+            ctx.BeginFigure(head.Tip, isFilled: true, isClosed: true);
+            ctx.LineTo(head.Left, isStroked: true, isSmoothJoin: false);
+            ctx.LineTo(head.Right, isStroked: true, isSmoothJoin: false);
+        }
+
+        triangle.Freeze();
+        ArrowHeadPreview.Data = triangle;
+        ArrowHeadPreview.Visibility = Visibility.Visible;
+
+        if (Distance(start, head.Base) < 0.5)
+        {
+            ArrowShaftPreview.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        ArrowShaftPreview.Data = new LineGeometry(start, PreviewShaftEnd(head, thickness));
+        ArrowShaftPreview.StrokeThickness = thickness;
+        ArrowShaftPreview.Visibility = Visibility.Visible;
+    }
+
+    private static Point PreviewShaftEnd(Arrowhead head, double thickness)
+    {
+        var dx = head.Tip.X - head.Base.X;
+        var dy = head.Tip.Y - head.Base.Y;
+        var length = Math.Sqrt(dx * dx + dy * dy);
+        if (length < 1e-6)
+        {
+            return head.Base;
+        }
+
+        var tuck = Math.Min(thickness, length * 0.45);
+        return new Point(head.Base.X + dx / length * tuck, head.Base.Y + dy / length * tuck);
     }
 
     private void ShowPixelRect(Point start, Point end)
@@ -1019,18 +1197,66 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             return;
         }
 
+        if (_tool == EditorTool.Highlight)
+        {
+            PixelateRect.Fill = HighlightFillBrush;
+            PixelateRect.Stroke = HighlightStrokeBrush;
+        }
+        else
+        {
+            PixelateRect.Fill = PixelateFillBrush;
+            PixelateRect.Stroke = PixelateStrokeBrush;
+        }
+
         var scale = FittedImageScale();
         if (scale <= 0)
         {
             scale = 1;
         }
-        PixelateRect.StrokeThickness = scale > 0 ? 2 / scale : 2;
+
+        PixelateRect.StrokeThickness = 2 / scale;
         PixelateRect.Margin = new Thickness(rect.X, rect.Y, 0, 0);
         PixelateRect.Width = rect.Width;
         PixelateRect.Height = rect.Height;
         PixelateRect.HorizontalAlignment = HorizontalAlignment.Left;
         PixelateRect.VerticalAlignment = VerticalAlignment.Top;
         PixelateRect.Visibility = Visibility.Visible;
+    }
+
+    private Point ClampToImage(Point point)
+    {
+        var width = _current?.PixelWidth ?? 0;
+        var height = _current?.PixelHeight ?? 0;
+        var maxX = Math.Max(0, width - 1);
+        var maxY = Math.Max(0, height - 1);
+        var x = point.X;
+        var y = point.Y;
+        if (double.IsNaN(x) || x < 0)
+        {
+            x = 0;
+        }
+        else if (x > maxX)
+        {
+            x = maxX;
+        }
+
+        if (double.IsNaN(y) || y < 0)
+        {
+            y = 0;
+        }
+        else if (y > maxY)
+        {
+            y = maxY;
+        }
+
+        return new Point(x, y);
+    }
+
+    private static double Distance(Point a, Point b)
+    {
+        var dx = a.X - b.X;
+        var dy = a.Y - b.Y;
+        return Math.Sqrt(dx * dx + dy * dy);
     }
 
     private Int32Rect PixelRect(Point start, Point end)
@@ -1269,5 +1495,12 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         var zoom = CurrentZoomPercent();
         var size = $"{_current!.PixelWidth} × {_current.PixelHeight} px";
         StatusText.Text = zoom > 0 ? $"{size}  ·  {zoom}%" : size;
+    }
+
+    private enum EditorTool
+    {
+        Pixelate,
+        Highlight,
+        Arrow
     }
 }

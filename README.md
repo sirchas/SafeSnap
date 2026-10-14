@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/screenshot-editor.png" width="760" alt="SafeSnap editor with a pixelated region">
+  <img src="docs/screenshot-editor.png" width="760" alt="SafeSnap editor with a pixelated region, a highlight and an arrow">
 </p>
 
 ---
@@ -29,8 +29,9 @@ Sharing a screenshot in a ticket, chat, or email often means exposing things you
 ## Features
 
 - 🖼️ **Region capture like Snipping Tool.** Freezes all monitors, dims the screen, and lets you drag a selection with crosshair guides and a live pixel-size readout. Handles multiple monitors and mixed DPI scaling (per-monitor DPI aware).
-- 🟦 **Always-on pixelate.** Just drag over anything sensitive (no tool to pick) and it's mosaicked. The edit is **destructive**: pixels are actually replaced, not overlaid.
-- ↩️ **Undo / Redo** for every pixelate step.
+- 🟦 **Pixelate by default.** Just drag over anything sensitive and it's mosaicked. The edit is **destructive**: pixels are actually replaced, not overlaid.
+- 🖍 **Highlight & Arrow tools.** Switch tools in the toolbar to drop a semi-transparent yellow highlight or a red arrow (drag sets direction and length; Small/Medium/Large sizes).
+- ↩️ **Undo / Redo** for every edit. All annotations are baked into the copied/saved image.
 - 📋 **Copy to clipboard** as a real bitmap plus PNG, so it pastes cleanly into Outlook, Teams, Word, Slack, and more.
 - 💾 **Save as PNG** to `Pictures\SafeSnap` with a timestamped filename.
 - ⌨️ **Global hotkey** `Ctrl+Shift+S` works from anywhere, even when SafeSnap is in the tray.
@@ -48,10 +49,10 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 
 | File | What it is |
 |---|---|
-| `SafeSnap-Setup-1.0.1.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
-| `SafeSnap-1.0.1-portable-win-x64.exe` | Portable single file. No install; just run it. |
-| `SafeSnap-Setup-1.0.1.zip` | The installer in a zip (with a short README.txt). |
-| `SafeSnap-1.0.1-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
+| `SafeSnap-Setup-1.1.0.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
+| `SafeSnap-1.1.0-portable-win-x64.exe` | Portable single file. No install; just run it. |
+| `SafeSnap-Setup-1.1.0.zip` | The installer in a zip (with a short README.txt). |
+| `SafeSnap-1.1.0-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
@@ -61,7 +62,7 @@ Both are self-contained (no .NET install required). Windows 10/11 x64.
 
 1. Click **New Capture** (or press `Ctrl+Shift+S` anywhere).
 2. Drag a region on the frozen screen. `Esc` cancels.
-3. Drag over anything sensitive; it's pixelated instantly (no tool to select). A one-time tip reminds you on your first capture.
+3. Drag over anything sensitive; it's pixelated instantly. Pick **Highlight** or **Arrow** in the toolbar to call things out instead (arrows: drag from start to end, choose Small/Medium/Large).
 4. **Copy** or **Save**.
 
 ### Keyboard shortcuts
