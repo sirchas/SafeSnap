@@ -55,7 +55,7 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
-> **SmartScreen note:** SafeSnap isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Click **More info → Run anyway**. You can verify your download against `SHA256SUMS.txt` on the release page.
+> **SmartScreen note:** SafeSnap isn't code-signed yet, so Windows may show *"Windows protected your PC"*. Click **More info → Run anyway**. For the zips, right-click the zip > **Properties** > **Unblock** before extracting. You can verify your download against `SHA256SUMS.txt` on the release page.
 
 ## Usage
 
