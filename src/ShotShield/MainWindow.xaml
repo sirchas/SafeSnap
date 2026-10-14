@@ -1,0 +1,668 @@
+<ui:FluentWindow
+    x:Class="ShotShield.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="SafeSnap"
+    Width="1100"
+    Height="720"
+    MinWidth="860"
+    MinHeight="520"
+    WindowStartupLocation="CenterScreen"
+    WindowBackdropType="Mica"
+    ExtendsContentIntoTitleBar="True"
+    UseLayoutRounding="True"
+    SnapsToDevicePixels="True"
+    Icon="app.ico">
+    <ui:FluentWindow.Resources>
+        <ScaleTransform x:Key="ToolbarScale" x:Shared="False" ScaleX="1" ScaleY="1" />
+        <ScaleTransform x:Key="EmptyCaptureScale" x:Shared="False" ScaleX="1" ScaleY="1" />
+
+        <Style x:Key="ToolbarButtonStyle" TargetType="{x:Type ui:Button}" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Appearance" Value="Transparent" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="RenderTransform" Value="{StaticResource ToolbarScale}" />
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="UIElement.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                To="1.05"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                To="1.05"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="Opacity"
+                                To="1"
+                                Duration="0:0:0.12" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="UIElement.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                To="1"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                To="1"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.82" />
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                    To="0.96"
+                                    Duration="0:0:0.08" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                    To="0.96"
+                                    Duration="0:0:0.08" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                    To="1"
+                                    Duration="0:0:0.12" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                    To="1"
+                                    Duration="0:0:0.12" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.42" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="ToolbarDropDownStyle"
+            TargetType="{x:Type ui:DropDownButton}"
+            BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="MinWidth" Value="64" />
+        </Style>
+
+        <Style x:Key="ToolbarToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Margin" Value="2,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="RenderTransform" Value="{StaticResource ToolbarScale}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border
+                            x:Name="Root"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="10"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="{ui:ThemeResource SystemAccentColorPrimaryBrush}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.42" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="UIElement.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                To="1.05"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                To="1.05"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="UIElement.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                To="1"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                To="1"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.82" />
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                    To="0.96"
+                                    Duration="0:0:0.08" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                    To="0.96"
+                                    Duration="0:0:0.08" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                    To="1"
+                                    Duration="0:0:0.12" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                    To="1"
+                                    Duration="0:0:0.12" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="EmptyCaptureButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="52,40" />
+            <Setter Property="MinWidth" Value="300" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="UseLayoutRounding" Value="True" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="RenderTransform" Value="{StaticResource EmptyCaptureScale}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border
+                            x:Name="Root"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="28"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <Border
+                                    x:Name="HoverOverlay"
+                                    Background="White"
+                                    CornerRadius="28"
+                                    IsHitTestVisible="False"
+                                    Opacity="0" />
+                                <Border
+                                    x:Name="PressOverlay"
+                                    Background="Black"
+                                    CornerRadius="28"
+                                    IsHitTestVisible="False"
+                                    Opacity="0" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HoverOverlay" Property="Opacity" Value="0.14" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="HoverOverlay" Property="Opacity" Value="0" />
+                                <Setter TargetName="PressOverlay" Property="Opacity" Value="0.16" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.42" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="UIElement.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                To="1.05"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                To="1.05"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="UIElement.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                To="1"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                To="1"
+                                Duration="0:0:0.14">
+                                <DoubleAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                    To="0.96"
+                                    Duration="0:0:0.08" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                    To="0.96"
+                                    Duration="0:0:0.08" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                    To="1"
+                                    Duration="0:0:0.12" />
+                                <DoubleAnimation
+                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                    To="1"
+                                    Duration="0:0:0.12" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </ui:FluentWindow.Resources>
+
+    <Grid x:Name="RootLayout" Background="{DynamicResource ControlFillColorDefaultBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            Title="SafeSnap"
+            Grid.Row="0"
+            Height="40"
+            Padding="12,0,4,0"
+            FontSize="13" />
+
+        <Border
+            x:Name="ToolbarBand"
+            Grid.Row="1"
+            Padding="8,2,8,6"
+            Background="Transparent"
+            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+            BorderThickness="0,0,0,1"
+            SnapsToDevicePixels="True">
+            <StackPanel Orientation="Horizontal">
+                <ui:Button
+                    x:Name="CaptureButton"
+                    Appearance="Primary"
+                    Click="CaptureButton_Click"
+                    Content="New Capture"
+                    Icon="{ui:SymbolIcon Screenshot24}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Capture every monitor (Ctrl+Shift+S)" />
+                <ui:DropDownButton
+                    x:Name="DelayButton"
+                    Content="0 s"
+                    Style="{StaticResource ToolbarDropDownStyle}"
+                    ToolTip="Wait before capturing">
+                    <ui:DropDownButton.Flyout>
+                        <ContextMenu>
+                            <MenuItem
+                                x:Name="Delay0Item"
+                                Click="DelayMenuItem_Click"
+                                Header="No delay"
+                                IsCheckable="True"
+                                IsChecked="True"
+                                Tag="0" />
+                            <MenuItem
+                                x:Name="Delay3Item"
+                                Click="DelayMenuItem_Click"
+                                Header="3 seconds"
+                                IsCheckable="True"
+                                Tag="3" />
+                            <MenuItem
+                                x:Name="Delay5Item"
+                                Click="DelayMenuItem_Click"
+                                Header="5 seconds"
+                                IsCheckable="True"
+                                Tag="5" />
+                        </ContextMenu>
+                    </ui:DropDownButton.Flyout>
+                </ui:DropDownButton>
+
+                <Rectangle
+                    Width="1"
+                    Height="22"
+                    Margin="8,0"
+                    Fill="{DynamicResource ControlElevationBorderBrush}" />
+
+                <ToggleButton
+                    x:Name="PixelateToggle"
+                    Checked="PixelateToggle_Changed"
+                    Style="{StaticResource ToolbarToggleStyle}"
+                    ToolTip="Drag a rectangle to pixelate"
+                    Unchecked="PixelateToggle_Changed">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
+                            Symbol="Grid24" />
+                        <TextBlock VerticalAlignment="Center" Text="Pixelate" />
+                    </StackPanel>
+                </ToggleButton>
+
+                <Rectangle
+                    Width="1"
+                    Height="22"
+                    Margin="8,0"
+                    Fill="{DynamicResource ControlElevationBorderBrush}" />
+
+                <ui:Button
+                    x:Name="UndoButton"
+                    Click="UndoButton_Click"
+                    Content="Undo"
+                    Icon="{ui:SymbolIcon ArrowUndo24}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Undo (Ctrl+Z)" />
+                <ui:Button
+                    x:Name="RedoButton"
+                    Click="RedoButton_Click"
+                    Content="Redo"
+                    Icon="{ui:SymbolIcon ArrowRedo24}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Redo (Ctrl+Y)" />
+                <ui:Button
+                    x:Name="CopyButton"
+                    Click="CopyButton_Click"
+                    Content="Copy"
+                    Icon="{ui:SymbolIcon Copy24}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Copy as bitmap and PNG (Ctrl+C)" />
+                <ui:Button
+                    x:Name="SaveButton"
+                    Click="SaveButton_Click"
+                    Content="Save"
+                    Icon="{ui:SymbolIcon Save24}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Save PNG (Ctrl+S)" />
+            </StackPanel>
+        </Border>
+
+        <Grid x:Name="CanvasArea" Grid.Row="2" ClipToBounds="True">
+            <Border
+                x:Name="CanvasBackdrop"
+                Background="{DynamicResource ControlFillColorSecondaryBrush}" />
+
+            <StackPanel
+                x:Name="EmptyState"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <Button
+                    x:Name="EmptyCaptureButton"
+                    Click="CaptureButton_Click"
+                    Style="{StaticResource EmptyCaptureButtonStyle}"
+                    ToolTip="Capture every monitor (Ctrl+Shift+S)">
+                    <StackPanel>
+                        <ui:SymbolIcon
+                            HorizontalAlignment="Center"
+                            FontSize="52"
+                            Foreground="{DynamicResource AccentButtonForeground}"
+                            Symbol="Screenshot24" />
+                        <TextBlock
+                            Margin="0,12,0,0"
+                            HorizontalAlignment="Center"
+                            FontSize="26"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource AccentButtonForeground}"
+                            Text="New Capture" />
+                    </StackPanel>
+                </Button>
+                <TextBlock
+                    Margin="0,14,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="13"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="Ctrl+Shift+S" />
+            </StackPanel>
+
+            <Grid
+                x:Name="ImageSlot"
+                Margin="6"
+                Visibility="Collapsed">
+                <Grid
+                    x:Name="ImageShadowFallback"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsHitTestVisible="False"
+                    Visibility="Collapsed">
+                    <Border Margin="-30,-20,-30,-34" Background="#03000000" CornerRadius="44" />
+                    <Border Margin="-24,-16,-24,-28" Background="#04000000" CornerRadius="38" />
+                    <Border Margin="-18,-12,-18,-22" Background="#05000000" CornerRadius="32" />
+                    <Border Margin="-14,-9,-14,-16" Background="#06000000" CornerRadius="28" />
+                    <Border Margin="-10,-6,-10,-12" Background="#08000000" CornerRadius="24" />
+                    <Border Margin="-7,-4,-7,-8" Background="#0A000000" CornerRadius="21" />
+                    <Border Margin="-4,-2,-4,-5" Background="#0C000000" CornerRadius="18" />
+                    <Border Margin="-2,-1,-2,-3" Background="#0E000000" CornerRadius="16" />
+                </Grid>
+                <Border
+                    x:Name="ImageShadow"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource ControlSolidFillColorDefaultBrush}"
+                    CornerRadius="14"
+                    IsHitTestVisible="False">
+                    <Border.Effect>
+                        <DropShadowEffect
+                            x:Name="ImageDropShadow"
+                            BlurRadius="22"
+                            Color="Black"
+                            Direction="270"
+                            Opacity="0.18"
+                            RenderingBias="Quality"
+                            ShadowDepth="3" />
+                    </Border.Effect>
+                </Border>
+                <Viewbox
+                    x:Name="ImageViewbox"
+                    Stretch="Uniform"
+                    SizeChanged="ImageViewbox_SizeChanged">
+                    <Border x:Name="ImageFrame" Padding="0" CornerRadius="14">
+                        <Grid
+                            x:Name="ImageHost"
+                            Background="Transparent"
+                            ClipToBounds="True"
+                            MouseLeftButtonDown="ImageHost_MouseLeftButtonDown"
+                            MouseLeftButtonUp="ImageHost_MouseLeftButtonUp"
+                            MouseMove="ImageHost_MouseMove"
+                            LostMouseCapture="ImageHost_LostMouseCapture"
+                            SizeChanged="ImageHost_SizeChanged">
+                            <Image
+                                x:Name="CanvasImage"
+                                SnapsToDevicePixels="True"
+                                Stretch="Fill" />
+                            <Rectangle
+                                x:Name="PixelateRect"
+                                Fill="#333B9EFF"
+                                IsHitTestVisible="False"
+                                RadiusX="2"
+                                RadiusY="2"
+                                Stroke="#FF3B9EFF"
+                                StrokeThickness="2"
+                                Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                </Viewbox>
+            </Grid>
+
+            <Border
+                x:Name="ToastRoot"
+                Margin="0,0,0,28"
+                Padding="16,10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="22"
+                IsHitTestVisible="False"
+                Opacity="0"
+                SnapsToDevicePixels="True"
+                Visibility="Collapsed">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="ToastSlide" Y="16" />
+                </Border.RenderTransform>
+                <StackPanel Orientation="Horizontal">
+                    <Viewbox
+                        Width="22"
+                        Height="22"
+                        Margin="0,0,10,0">
+                        <Canvas Width="24" Height="24">
+                            <Ellipse
+                                Width="24"
+                                Height="24"
+                                Stroke="{ui:ThemeResource SystemAccentColorPrimaryBrush}"
+                                StrokeThickness="2" />
+                            <Path
+                                x:Name="ToastCheck"
+                                Data="M6,12 L10.5,16.5 L18,8"
+                                Fill="Transparent"
+                                Stroke="{ui:ThemeResource SystemAccentColorPrimaryBrush}"
+                                StrokeDashArray="24"
+                                StrokeDashOffset="24"
+                                StrokeEndLineCap="Round"
+                                StrokeLineJoin="Round"
+                                StrokeStartLineCap="Round"
+                                StrokeThickness="2.4" />
+                        </Canvas>
+                    </Viewbox>
+                    <TextBlock
+                        x:Name="ToastText"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border
+            Grid.Row="3"
+            Padding="16,7"
+            Background="{DynamicResource ControlFillColorDefaultBrush}"
+            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+            BorderThickness="0,1,0,0">
+            <TextBlock
+                x:Name="StatusText"
+                FontSize="12"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Ready" />
+        </Border>
+    </Grid>
+</ui:FluentWindow>

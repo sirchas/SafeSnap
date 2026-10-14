@@ -1,0 +1,19 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+dist/
+installer/Output/
+TestResults/
+*.trx
+.vs/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+
+# Local tooling / agent logs and scratch files
+grok*.log
+prompt*.txt
+/screenshot-*.png
+*.blank.png

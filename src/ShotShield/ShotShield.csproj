@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- The manifest declares PerMonitorV2. WFAC010 wants that moved to ApplicationHighDpiMode; keep the manifest so the OS applies it before startup. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+    <RootNamespace>ShotShield</RootNamespace>
+    <AssemblyName>SafeSnap</AssemblyName>
+    <Product>SafeSnap</Product>
+    <AssemblyTitle>SafeSnap</AssemblyTitle>
+    <Version>1.0.0</Version>
+    <Description>SafeSnap captures the desktop, pixelates sensitive regions, then copies or saves a PNG.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="3.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,6 @@
+{
+  "configProperties": {
+    "Switch.System.Windows.Media.ShouldRenderEvenWhenNoDisplayDevicesAreAvailable": true,
+    "Switch.System.Windows.Media.ShouldNotRenderInNonInteractiveWindowStation": false
+  }
+}
