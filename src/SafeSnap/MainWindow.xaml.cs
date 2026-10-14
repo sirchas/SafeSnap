@@ -136,21 +136,33 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         {
             ToastRoot.Visibility = Visibility.Collapsed;
             ToastRoot.Opacity = 0;
+            HidePixelateTip();
 
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
 
             if (!string.IsNullOrWhiteSpace(App.ScreenshotEmptyPath))
             {
+                HidePixelateTip();
                 UpdateLayout();
                 RenderWindowToPng(App.ScreenshotEmptyPath);
             }
 
             if (!string.IsNullOrWhiteSpace(App.ScreenshotPath))
             {
+                HidePixelateTip();
                 SetImage(CreateWorkspaceDemoImage(), resetHistory: true);
                 UpdateLayout();
                 await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 RenderWindowToPng(App.ScreenshotPath);
+            }
+
+            if (!string.IsNullOrWhiteSpace(App.ScreenshotTipPath))
+            {
+                SetImage(CreateWorkspaceDemoImage(), resetHistory: true);
+                ShowPixelateTip(animate: false);
+                UpdateLayout();
+                await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                RenderWindowToPng(App.ScreenshotTipPath);
             }
 
             Application.Current.Shutdown(0);
@@ -159,7 +171,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         {
             try
             {
-                var path = (App.ScreenshotPath ?? App.ScreenshotEmptyPath) + ".error.txt";
+                var path = (App.ScreenshotPath ?? App.ScreenshotTipPath ?? App.ScreenshotEmptyPath) + ".error.txt";
                 File.WriteAllText(path, ex.ToString());
             }
             catch (Exception)
@@ -220,9 +232,11 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
         var plate = OpaqueColor("SolidBackgroundFillColorBase", "SolidBackgroundFillColorBaseBrush", Color.FromRgb(243, 243, 243));
         var canvas = OpaqueColor("SolidBackgroundFillColorSecondary", "SolidBackgroundFillColorSecondaryBrush", Color.FromRgb(238, 238, 238));
+        var card = OpaqueColor("SolidBackgroundFillColorBase", "SolidBackgroundFillColorBaseBrush", Color.FromRgb(255, 255, 255));
         Background = FrozenBrush(plate);
         RootLayout.Background = FrozenBrush(plate);
         CanvasBackdrop.Background = FrozenBrush(canvas);
+        PixelateTip.Background = FrozenBrush(card);
     }
 
     private void EnableScreenshotShadowFallback()
@@ -761,6 +775,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         UpdateChrome();
+        MaybeShowPixelateTip();
     }
 
     private void ImageHost_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -845,25 +860,76 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             ImageCornerRadius);
     }
 
-    private void PixelateToggle_Changed(object sender, RoutedEventArgs e)
+    private void MaybeShowPixelateTip()
     {
-        if (_pixelDrag)
+        // Screenshot modes never consult settings. --screenshot-tip shows the card itself.
+        if (_screenshotMode || _current is null || PixelateTipHost.Visibility == Visibility.Visible)
         {
-            _pixelDrag = false;
-            if (ImageHost.IsMouseCaptured)
-            {
-                ImageHost.ReleaseMouseCapture();
-            }
-
-            PixelateRect.Visibility = Visibility.Collapsed;
+            return;
         }
 
-        UpdateChrome();
+        if (AppSettings.HasShownPixelateTip())
+        {
+            return;
+        }
+
+        ShowPixelateTip(animate: true);
+    }
+
+    private void ShowPixelateTip(bool animate)
+    {
+        PixelateTipHost.BeginAnimation(OpacityProperty, null);
+        PixelateTipSlide.BeginAnimation(TranslateTransform.YProperty, null);
+        PixelateTipHost.Visibility = Visibility.Visible;
+
+        if (!animate)
+        {
+            PixelateTipHost.Opacity = 1;
+            PixelateTipSlide.Y = 0;
+            return;
+        }
+
+        var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+        PixelateTipHost.BeginAnimation(
+            OpacityProperty,
+            new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(220)) { EasingFunction = ease });
+        PixelateTipSlide.BeginAnimation(
+            TranslateTransform.YProperty,
+            new DoubleAnimation(-10, 0, TimeSpan.FromMilliseconds(260)) { EasingFunction = ease });
+    }
+
+    private void HidePixelateTip()
+    {
+        PixelateTipHost.BeginAnimation(OpacityProperty, null);
+        PixelateTipSlide.BeginAnimation(TranslateTransform.YProperty, null);
+        PixelateTipHost.Opacity = 1;
+        PixelateTipSlide.Y = 0;
+        PixelateTipHost.Visibility = Visibility.Collapsed;
+    }
+
+    private void DismissPixelateTip()
+    {
+        if (PixelateTipHost.Visibility != Visibility.Visible)
+        {
+            return;
+        }
+
+        HidePixelateTip();
+        if (!_screenshotMode)
+        {
+            AppSettings.MarkPixelateTipShown();
+        }
+    }
+
+    private void PixelateTipGotIt_Click(object sender, RoutedEventArgs e)
+    {
+        DismissPixelateTip();
+        e.Handled = true;
     }
 
     private void ImageHost_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (PixelateToggle.IsChecked != true || _current is null)
+        if (_current is null)
         {
             return;
         }
@@ -884,6 +950,11 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         _pixelCurrent = e.GetPosition(ImageHost);
+        if (Math.Abs(_pixelCurrent.X - _pixelStart.X) >= 1 || Math.Abs(_pixelCurrent.Y - _pixelStart.Y) >= 1)
+        {
+            DismissPixelateTip();
+        }
+
         ShowPixelRect(_pixelStart, _pixelCurrent);
         e.Handled = true;
     }
@@ -930,6 +1001,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             return;
         }
 
+        DismissPixelateTip();
         var snapshot = ImageUtility.Clone(_current);
         Pixelator.Pixelate(_current, rect);
         _history.PushUndo(snapshot);
@@ -1176,10 +1248,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private void UpdateChrome()
     {
         var hasImage = _current is not null;
-        var pixelate = PixelateToggle.IsChecked == true && hasImage;
-        ImageHost.Cursor = pixelate ? Cursors.Cross : Cursors.Arrow;
-        ImageHost.IsHitTestVisible = pixelate;
-        PixelateToggle.IsEnabled = hasImage;
+        ImageHost.Cursor = hasImage ? Cursors.Cross : Cursors.Arrow;
+        ImageHost.IsHitTestVisible = hasImage;
         UndoButton.IsEnabled = hasImage && _history.CanUndo;
         RedoButton.IsEnabled = hasImage && _history.CanRedo;
         CopyButton.IsEnabled = hasImage;

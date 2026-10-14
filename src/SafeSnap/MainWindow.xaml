@@ -123,123 +123,6 @@
             <Setter Property="MinWidth" Value="64" />
         </Style>
 
-        <Style x:Key="ToolbarToggleStyle" TargetType="{x:Type ToggleButton}">
-            <Setter Property="Padding" Value="12,8" />
-            <Setter Property="Margin" Value="2,0" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
-            <Setter Property="RenderTransform" Value="{StaticResource ToolbarScale}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border
-                            x:Name="Root"
-                            Padding="{TemplateBinding Padding}"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="10"
-                            SnapsToDevicePixels="True">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="{ui:ThemeResource SystemAccentColorPrimaryBrush}" />
-                                <Setter Property="Foreground" Value="White" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.42" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <EventTrigger RoutedEvent="UIElement.MouseEnter">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                                To="1.05"
-                                Duration="0:0:0.14">
-                                <DoubleAnimation.EasingFunction>
-                                    <QuadraticEase EasingMode="EaseOut" />
-                                </DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                To="1.05"
-                                Duration="0:0:0.14">
-                                <DoubleAnimation.EasingFunction>
-                                    <QuadraticEase EasingMode="EaseOut" />
-                                </DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-                <EventTrigger RoutedEvent="UIElement.MouseLeave">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                                To="1"
-                                Duration="0:0:0.14">
-                                <DoubleAnimation.EasingFunction>
-                                    <QuadraticEase EasingMode="EaseOut" />
-                                </DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                To="1"
-                                Duration="0:0:0.14">
-                                <DoubleAnimation.EasingFunction>
-                                    <QuadraticEase EasingMode="EaseOut" />
-                                </DoubleAnimation.EasingFunction>
-                            </DoubleAnimation>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Opacity" Value="0.82" />
-                    <Trigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation
-                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                                    To="0.96"
-                                    Duration="0:0:0.08" />
-                                <DoubleAnimation
-                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                    To="0.96"
-                                    Duration="0:0:0.08" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.EnterActions>
-                    <Trigger.ExitActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation
-                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                                    To="1"
-                                    Duration="0:0:0.12" />
-                                <DoubleAnimation
-                                    Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                    To="1"
-                                    Duration="0:0:0.12" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.ExitActions>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <Style x:Key="EmptyCaptureButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
@@ -441,29 +324,6 @@
                     Margin="8,0"
                     Fill="{DynamicResource ControlElevationBorderBrush}" />
 
-                <ToggleButton
-                    x:Name="PixelateToggle"
-                    Checked="PixelateToggle_Changed"
-                    Style="{StaticResource ToolbarToggleStyle}"
-                    ToolTip="Drag a rectangle to pixelate"
-                    Unchecked="PixelateToggle_Changed">
-                    <StackPanel Orientation="Horizontal">
-                        <ui:SymbolIcon
-                            Margin="0,0,6,0"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ToggleButton}}"
-                            Symbol="Grid24" />
-                        <TextBlock VerticalAlignment="Center" Text="Pixelate" />
-                    </StackPanel>
-                </ToggleButton>
-
-                <Rectangle
-                    Width="1"
-                    Height="22"
-                    Margin="8,0"
-                    Fill="{DynamicResource ControlElevationBorderBrush}" />
-
                 <ui:Button
                     x:Name="UndoButton"
                     Click="UndoButton_Click"
@@ -599,6 +459,93 @@
                         </Grid>
                     </Border>
                 </Viewbox>
+            </Grid>
+
+            <Grid
+                x:Name="PixelateTipHost"
+                Margin="0,118,0,0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Panel.ZIndex="4"
+                Visibility="Collapsed">
+                <Grid.RenderTransform>
+                    <TranslateTransform x:Name="PixelateTipSlide" />
+                </Grid.RenderTransform>
+                <Border Margin="-26,-10,-26,-34" Background="#03000000" CornerRadius="36" IsHitTestVisible="False" />
+                <Border Margin="-22,-8,-22,-30" Background="#04000000" CornerRadius="34" IsHitTestVisible="False" />
+                <Border Margin="-18,-7,-18,-26" Background="#04000000" CornerRadius="32" IsHitTestVisible="False" />
+                <Border Margin="-15,-6,-15,-22" Background="#05000000" CornerRadius="30" IsHitTestVisible="False" />
+                <Border Margin="-12,-5,-12,-19" Background="#05000000" CornerRadius="28" IsHitTestVisible="False" />
+                <Border Margin="-10,-4,-10,-16" Background="#06000000" CornerRadius="26" IsHitTestVisible="False" />
+                <Border Margin="-8,-3,-8,-13" Background="#07000000" CornerRadius="24" IsHitTestVisible="False" />
+                <Border Margin="-6,-2,-6,-10" Background="#08000000" CornerRadius="22" IsHitTestVisible="False" />
+                <Border Margin="-4,-1,-4,-8" Background="#09000000" CornerRadius="20" IsHitTestVisible="False" />
+                <Border Margin="-2,0,-2,-5" Background="#0B000000" CornerRadius="18" IsHitTestVisible="False" />
+                <Border
+                    x:Name="PixelateTip"
+                    MaxWidth="480"
+                    Padding="14,12"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource ControlSolidFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    SnapsToDevicePixels="True">
+                    <Border.Effect>
+                        <DropShadowEffect
+                            BlurRadius="28"
+                            Color="Black"
+                            Direction="270"
+                            Opacity="0.20"
+                            RenderingBias="Quality"
+                            ShadowDepth="4" />
+                    </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Width="36"
+                        Height="36"
+                        Margin="0,0,12,0"
+                        VerticalAlignment="Center"
+                        Background="{ui:ThemeResource SystemAccentColorPrimaryBrush}"
+                        CornerRadius="18">
+                        <ui:SymbolIcon
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Foreground="White"
+                            Symbol="Lightbulb24" />
+                    </Border>
+                    <TextBlock
+                        Grid.Column="1"
+                        MaxWidth="280"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        LineHeight="18"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="Tip: drag over anything you want to hide. It'll be pixelated."
+                        TextWrapping="Wrap" />
+                    <ui:Button
+                        x:Name="PixelateTipGotIt"
+                        Grid.Column="2"
+                        Margin="14,0,0,0"
+                        Padding="14,7"
+                        VerticalAlignment="Center"
+                        Appearance="Primary"
+                        Click="PixelateTipGotIt_Click"
+                        Content="Got it"
+                        CornerRadius="8"
+                        Cursor="Hand"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        FocusVisualStyle="{x:Null}" />
+                    </Grid>
+                </Border>
             </Grid>
 
             <Border

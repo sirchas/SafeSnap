@@ -29,15 +29,21 @@ public partial class App : Application
 
     public static string? ScreenshotEmptyPath { get; private set; }
 
+    public static string? ScreenshotTipPath { get; private set; }
+
     public static bool IsScreenshotMode =>
-        !string.IsNullOrWhiteSpace(ScreenshotPath) || !string.IsNullOrWhiteSpace(ScreenshotEmptyPath);
+        !string.IsNullOrWhiteSpace(ScreenshotPath)
+        || !string.IsNullOrWhiteSpace(ScreenshotEmptyPath)
+        || !string.IsNullOrWhiteSpace(ScreenshotTipPath);
 
     protected override void OnStartup(StartupEventArgs e)
     {
         ReadScreenshotArgs(e.Args);
         if (IsScreenshotMode)
         {
-            // Screenshot runs must not take the interactive mutex or leave a tray process behind.
+            // Screenshot runs must not take the interactive mutex, leave a tray process behind,
+            // or read/write the real settings file.
+            AppSettings.IsolateFromDisk();
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
         }
         else if (!TryBecomePrimaryInstance())
@@ -193,6 +199,10 @@ public partial class App : Application
             else if (string.Equals(args[i], "--screenshot-empty", StringComparison.OrdinalIgnoreCase))
             {
                 ScreenshotEmptyPath = args[i + 1];
+            }
+            else if (string.Equals(args[i], "--screenshot-tip", StringComparison.OrdinalIgnoreCase))
+            {
+                ScreenshotTipPath = args[i + 1];
             }
         }
     }

@@ -29,7 +29,7 @@ Sharing a screenshot in a ticket, chat, or email often means exposing things you
 ## Features
 
 - 🖼️ **Region capture like Snipping Tool.** Freezes all monitors, dims the screen, and lets you drag a selection with crosshair guides and a live pixel-size readout. Handles multiple monitors and mixed DPI scaling (per-monitor DPI aware).
-- 🟦 **Pixelate tool.** Drag rectangles to mosaic sensitive areas. The edit is **destructive**: pixels are actually replaced, not overlaid.
+- 🟦 **Always-on pixelate.** Just drag over anything sensitive (no tool to pick) and it's mosaicked. The edit is **destructive**: pixels are actually replaced, not overlaid.
 - ↩️ **Undo / Redo** for every pixelate step.
 - 📋 **Copy to clipboard** as a real bitmap plus PNG, so it pastes cleanly into Outlook, Teams, Word, Slack, and more.
 - 💾 **Save as PNG** to `Pictures\SafeSnap` with a timestamped filename.
@@ -39,7 +39,7 @@ Sharing a screenshot in a ticket, chat, or email often means exposing things you
 - 🌗 **Modern Windows 11 look** with Fluent design and Mica, following your light/dark theme.
 
 <p align="center">
-  <img src="docs/screenshot-start.png" width="560" alt="SafeSnap start screen">
+  <img src="docs/screenshot-start.png" width="420" alt="SafeSnap start screen">&nbsp;<img src="docs/screenshot-tip.png" width="420" alt="First-capture tip">
 </p>
 
 ## Download & install
@@ -48,8 +48,8 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 
 | File | What it is |
 |---|---|
-| `SafeSnap-Setup-1.0.0.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
-| `SafeSnap-1.0.0-portable-win-x64.exe` | Portable single file. No install; just run it. |
+| `SafeSnap-Setup-1.0.1.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
+| `SafeSnap-1.0.1-portable-win-x64.exe` | Portable single file. No install; just run it. |
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
@@ -59,7 +59,7 @@ Both are self-contained (no .NET install required). Windows 10/11 x64.
 
 1. Click **New Capture** (or press `Ctrl+Shift+S` anywhere).
 2. Drag a region on the frozen screen. `Esc` cancels.
-3. Turn on **Pixelate** and drag boxes over anything sensitive.
+3. Drag over anything sensitive; it's pixelated instantly (no tool to select). A one-time tip reminds you on your first capture.
 4. **Copy** or **Save**.
 
 ### Keyboard shortcuts

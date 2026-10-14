@@ -15,7 +15,7 @@
     <AssemblyName>SafeSnap</AssemblyName>
     <Product>SafeSnap</Product>
     <AssemblyTitle>SafeSnap</AssemblyTitle>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Description>SafeSnap captures the desktop, pixelates sensitive regions, then copies or saves a PNG.</Description>
   </PropertyGroup>
 
@@ -25,6 +25,10 @@
 
   <ItemGroup>
     <Resource Include="app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SafeSnap.Tests" />
   </ItemGroup>
 
 </Project>
