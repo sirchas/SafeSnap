@@ -225,13 +225,10 @@ public class AnnotatorTests
         }
     }
 
-    [Theory]
-    [InlineData(ArrowSize.Small, 3)]
-    [InlineData(ArrowSize.Medium, 5)]
-    [InlineData(ArrowSize.Large, 8)]
-    public void ArrowThicknessPresetsAreThreeFiveAndEight(ArrowSize size, double thickness)
+    [Fact]
+    public void ArrowUsesTheFixedLargeThickness()
     {
-        Assert.Equal(thickness, Annotator.Thickness(size));
+        Assert.Equal(8, Annotator.Thickness);
     }
 
     [Theory]
@@ -244,7 +241,7 @@ public class AnnotatorTests
     {
         var start = new Point(x0, y0);
         var end = new Point(x1, y1);
-        var head = Annotator.CreateArrowhead(start, end, 5);
+        var head = Annotator.CreateArrowhead(start, end, Annotator.Thickness);
 
         Assert.Equal(end.X, head.Tip.X, 6);
         Assert.Equal(end.Y, head.Tip.Y, 6);
@@ -265,46 +262,41 @@ public class AnnotatorTests
     }
 
     [Fact]
-    public void ArrowheadScalesInProportionToThickness()
+    public void ArrowheadGeometryMatchesLargeThickness()
     {
         var start = new Point(0, 0);
         var end = new Point(200, 0);
-        var small = Annotator.CreateArrowhead(start, end, 3);
-        var large = Annotator.CreateArrowhead(start, end, 8);
+        var head = Annotator.CreateArrowhead(start, end, Annotator.Thickness);
 
-        var smallLength = small.Tip.X - small.Base.X;
-        var largeLength = large.Tip.X - large.Base.X;
-        var smallWidth = Math.Abs(small.Left.Y - small.Right.Y);
-        var largeWidth = Math.Abs(large.Left.Y - large.Right.Y);
+        var length = head.Tip.X - head.Base.X;
+        var width = Math.Abs(head.Left.Y - head.Right.Y);
 
-        Assert.Equal(8.0 / 3.0, largeLength / smallLength, 6);
-        Assert.Equal(8.0 / 3.0, largeWidth / smallWidth, 6);
-        Assert.Equal(3 * Annotator.HeadLengthPerThickness, smallLength, 6);
-        Assert.Equal(3 * Annotator.HeadHalfWidthPerThickness * 2, smallWidth, 6);
-        Assert.Equal(small.Tip.Y, small.Base.Y, 6);
-        Assert.True(small.Left.Y > small.Tip.Y);
-        Assert.True(small.Right.Y < small.Tip.Y);
+        Assert.Equal(Annotator.Thickness * Annotator.HeadLengthPerThickness, length, 6);
+        Assert.Equal(Annotator.Thickness * Annotator.HeadHalfWidthPerThickness * 2, width, 6);
+        Assert.Equal(head.Tip.Y, head.Base.Y, 6);
+        Assert.True(head.Left.Y > head.Tip.Y);
+        Assert.True(head.Right.Y < head.Tip.Y);
     }
 
     [Fact]
     public void ShortDragShrinksTheHeadSoItStaysOnTheSegment()
     {
-        var head = Annotator.CreateArrowhead(new Point(0, 0), new Point(10, 0), 8);
+        var head = Annotator.CreateArrowhead(new Point(0, 0), new Point(10, 0), Annotator.Thickness);
         var actual = head.Tip.X - head.Base.X;
-        var natural = 8 * Annotator.HeadLengthPerThickness;
+        var natural = Annotator.Thickness * Annotator.HeadLengthPerThickness;
 
         Assert.Equal(10, actual, 6);
         Assert.True(actual < natural);
         Assert.Equal(0, head.Base.X, 6);
         Assert.Equal(10, head.Tip.X, 6);
-        Assert.True(Math.Abs(head.Left.Y - head.Right.Y) < 8 * Annotator.HeadHalfWidthPerThickness * 2);
+        Assert.True(Math.Abs(head.Left.Y - head.Right.Y) < Annotator.Thickness * Annotator.HeadHalfWidthPerThickness * 2);
     }
 
     [Fact]
     public void ArrowheadRejectsAZeroLengthDrag()
     {
         Assert.Throws<ArgumentException>(() =>
-            Annotator.CreateArrowhead(new Point(4, 4), new Point(4, 4), 5));
+            Annotator.CreateArrowhead(new Point(4, 4), new Point(4, 4), Annotator.Thickness));
     }
 
     private static int DistanceToYellow((byte B, byte G, byte R, byte A) pixel)

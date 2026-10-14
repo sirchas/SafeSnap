@@ -91,7 +91,7 @@ public static class DemoImage
         var start = new Point(760 * sx, 188 * sy);
         var end = new Point(400 * sx, 296 * sy);
         var scale = Math.Max(1d, Math.Min(sx, sy));
-        Annotator.DrawArrow(bitmap, start, end, Annotator.Thickness(ArrowSize.Large) * scale);
+        Annotator.DrawArrow(bitmap, start, end, Annotator.Thickness * scale);
     }
 
     private static FormattedText Text(string value, double size, Brush brush, double pixelsPerDip)

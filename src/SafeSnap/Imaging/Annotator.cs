@@ -1,12 +1,5 @@
 namespace SafeSnap.Imaging;
 
-public enum ArrowSize
-{
-    Small,
-    Medium,
-    Large
-}
-
 /// <summary>
 /// Tip sits on the drag end. Left and Right are the base corners, and Base is
 /// the midpoint where the shaft meets the head.
@@ -43,20 +36,14 @@ public static class Annotator
 
     public const double HeadHalfWidthPerThickness = 1.75;
 
+    /// <summary>
+    /// Fixed arrow shaft thickness (the former Large preset).
+    /// </summary>
+    public const double Thickness = 8;
+
     public static Color HighlightColor { get; } = Color.FromRgb(255, 230, 0);
 
     public static Color ArrowColor { get; } = Color.FromRgb(0xE5, 0x39, 0x35);
-
-    public static double Thickness(ArrowSize size)
-    {
-        return size switch
-        {
-            ArrowSize.Small => 3,
-            ArrowSize.Medium => 5,
-            ArrowSize.Large => 8,
-            _ => throw new ArgumentOutOfRangeException(nameof(size))
-        };
-    }
 
     public static Arrowhead CreateArrowhead(Point start, Point end, double thickness)
     {
@@ -192,9 +179,9 @@ public static class Annotator
         EditBuffer(bitmap, (buffer, width, height, stride) => Highlight(buffer, width, height, stride, region, color, alpha));
     }
 
-    public static void DrawArrow(WriteableBitmap bitmap, Point start, Point end, ArrowSize size)
+    public static void DrawArrow(WriteableBitmap bitmap, Point start, Point end)
     {
-        DrawArrow(bitmap, start, end, Thickness(size));
+        DrawArrow(bitmap, start, end, Thickness);
     }
 
     public static void DrawArrow(WriteableBitmap bitmap, Point start, Point end, double thickness)

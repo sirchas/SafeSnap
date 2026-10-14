@@ -32,7 +32,6 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private bool _arrangingShadow;
     private bool _exitRequested;
     private EditorTool _tool = EditorTool.Pixelate;
-    private ArrowSize _arrowSize = ArrowSize.Medium;
 
     public MainWindow()
     {
@@ -953,21 +952,6 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         SetTool(EditorTool.Arrow);
     }
 
-    private void ArrowSmallButton_Click(object sender, RoutedEventArgs e)
-    {
-        SetArrowSize(ArrowSize.Small);
-    }
-
-    private void ArrowMediumButton_Click(object sender, RoutedEventArgs e)
-    {
-        SetArrowSize(ArrowSize.Medium);
-    }
-
-    private void ArrowLargeButton_Click(object sender, RoutedEventArgs e)
-    {
-        SetArrowSize(ArrowSize.Large);
-    }
-
     private void SetTool(EditorTool tool)
     {
         _tool = tool;
@@ -978,25 +962,11 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
     }
 
-    private void SetArrowSize(ArrowSize size)
-    {
-        _arrowSize = size;
-        ApplyToolChrome();
-        if (_pixelDrag && _tool == EditorTool.Arrow)
-        {
-            UpdateDragPreview();
-        }
-    }
-
     private void ApplyToolChrome()
     {
         PixelateToolButton.Tag = _tool == EditorTool.Pixelate ? "Selected" : null;
         HighlightToolButton.Tag = _tool == EditorTool.Highlight ? "Selected" : null;
         ArrowToolButton.Tag = _tool == EditorTool.Arrow ? "Selected" : null;
-        ArrowSmallButton.Tag = _arrowSize == ArrowSize.Small ? "Selected" : null;
-        ArrowMediumButton.Tag = _arrowSize == ArrowSize.Medium ? "Selected" : null;
-        ArrowLargeButton.Tag = _arrowSize == ArrowSize.Large ? "Selected" : null;
-        ArrowSizeBand.Visibility = _tool == EditorTool.Arrow ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void ImageHost_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1077,7 +1047,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
                 return;
             }
 
-            CommitEdit(() => Annotator.DrawArrow(bitmap, start, end, _arrowSize));
+            CommitEdit(() => Annotator.DrawArrow(bitmap, start, end));
             return;
         }
 
@@ -1149,7 +1119,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             return;
         }
 
-        var thickness = Annotator.Thickness(_arrowSize);
+        var thickness = Annotator.Thickness;
         var head = Annotator.CreateArrowhead(start, end, thickness);
         var triangle = new StreamGeometry();
         using (var ctx = triangle.Open())
