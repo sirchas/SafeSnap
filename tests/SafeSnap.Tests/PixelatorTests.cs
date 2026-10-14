@@ -2,10 +2,10 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using ShotShield.Imaging;
+using SafeSnap.Imaging;
 using Xunit;
 
-namespace ShotShield.Tests;
+namespace SafeSnap.Tests;
 
 public class PixelatorTests
 {

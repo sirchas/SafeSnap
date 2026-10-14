@@ -5,7 +5,7 @@ using DrawingBitmap = System.Drawing.Bitmap;
 using DrawingPixelFormat = System.Drawing.Imaging.PixelFormat;
 using DrawingSize = System.Drawing.Size;
 
-namespace ShotShield.Capture;
+namespace SafeSnap.Capture;
 
 public sealed class CapturedScreen : IDisposable
 {

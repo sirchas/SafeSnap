@@ -1,6 +1,6 @@
 using System.Windows.Shapes;
 
-namespace ShotShield.Capture;
+namespace SafeSnap.Capture;
 
 public partial class SelectionOverlayWindow : Window
 {

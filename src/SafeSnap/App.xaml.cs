@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace ShotShield;
+namespace SafeSnap;
 
 public partial class App : Application
 {

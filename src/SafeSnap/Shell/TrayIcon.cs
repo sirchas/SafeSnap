@@ -1,4 +1,4 @@
-namespace ShotShield;
+namespace SafeSnap;
 
 internal sealed class TrayIcon : IDisposable
 {

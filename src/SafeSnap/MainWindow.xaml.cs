@@ -1,8 +1,8 @@
-using ShotShield.Capture;
-using ShotShield.Hotkey;
-using ShotShield.Imaging;
+using SafeSnap.Capture;
+using SafeSnap.Hotkey;
+using SafeSnap.Imaging;
 
-namespace ShotShield;
+namespace SafeSnap;
 
 public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {

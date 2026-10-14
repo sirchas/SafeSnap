@@ -5,11 +5,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B5004AC7-3486-45F9-938B-174ACEA8E4CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShotShield", "src\ShotShield\ShotShield.csproj", "{126DE5E8-35AF-452A-A401-31114CAA9C7C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeSnap", "src\SafeSnap\SafeSnap.csproj", "{126DE5E8-35AF-452A-A401-31114CAA9C7C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{771C3811-D39B-46C1-8E80-D1E682C68B3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShotShield.Tests", "tests\ShotShield.Tests\ShotShield.Tests.csproj", "{327E188B-553E-4BEB-B193-2E2518B5A123}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SafeSnap.Tests", "tests\SafeSnap.Tests\SafeSnap.Tests.csproj", "{327E188B-553E-4BEB-B193-2E2518B5A123}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

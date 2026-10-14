@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
   <img src="docs/icon.png" width="112" alt="SafeSnap icon">
 </p>
 
@@ -88,17 +88,15 @@ Requirements: Windows 10/11, [.NET 8 SDK](https://dotnet.microsoft.com/download/
 ```powershell
 git clone https://github.com/sirchas/SafeSnap.git
 cd SafeSnap
-dotnet build ShotShield.sln
-dotnet test ShotShield.sln
+dotnet build SafeSnap.sln
+dotnet test SafeSnap.sln
 
 # Single-file, self-contained exe -> .\publish\SafeSnap.exe
-dotnet publish src\ShotShield\ShotShield.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+dotnet publish src\SafeSnap\SafeSnap.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
 
 # Optional installer (requires Inno Setup 6) -> installer\Output\
 ISCC.exe installer\SafeSnap.iss
 ```
-
-> The project folders still use the original working name `ShotShield`; the app, exe, and branding are SafeSnap.
 
 Built with WPF on .NET 8 and [WPF-UI](https://github.com/lepoco/wpfui).
 

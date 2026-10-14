@@ -1,4 +1,4 @@
-namespace ShotShield.Capture;
+namespace SafeSnap.Capture;
 
 internal static class NativeMethods
 {

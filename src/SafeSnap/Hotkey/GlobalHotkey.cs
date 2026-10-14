@@ -1,6 +1,6 @@
-using ShotShield.Capture;
+using SafeSnap.Capture;
 
-namespace ShotShield.Hotkey;
+namespace SafeSnap.Hotkey;
 
 public sealed class GlobalHotkey : IDisposable
 {

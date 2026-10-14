@@ -1,4 +1,4 @@
-# Generates src\ShotShield\app.ico: a shield with a mosaic grid, at 16, 32, 48, and 256 px.
+# Generates src\SafeSnap\app.ico: a shield with a mosaic grid, at 16, 32, 48, and 256 px.
 # Requires Windows PowerShell 5.1 and System.Drawing.
 
 param(
@@ -11,7 +11,7 @@ Add-Type -AssemblyName System.Drawing
 
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
     $root = Split-Path -Parent $PSScriptRoot
-    $OutputPath = Join-Path $root "src\ShotShield\app.ico"
+    $OutputPath = Join-Path $root "src\SafeSnap\app.ico"
 }
 
 function New-ShieldPoint([double]$x, [double]$y) {

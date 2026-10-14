@@ -11,7 +11,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- The manifest declares PerMonitorV2. WFAC010 wants that moved to ApplicationHighDpiMode; keep the manifest so the OS applies it before startup. -->
     <NoWarn>$(NoWarn);WFAC010</NoWarn>
-    <RootNamespace>ShotShield</RootNamespace>
+    <RootNamespace>SafeSnap</RootNamespace>
     <AssemblyName>SafeSnap</AssemblyName>
     <Product>SafeSnap</Product>
     <AssemblyTitle>SafeSnap</AssemblyTitle>

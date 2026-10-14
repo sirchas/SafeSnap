@@ -1,4 +1,4 @@
-namespace ShotShield.Imaging;
+namespace SafeSnap.Imaging;
 
 public sealed class EditHistory
 {

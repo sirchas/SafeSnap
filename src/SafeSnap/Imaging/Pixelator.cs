@@ -1,4 +1,4 @@
-namespace ShotShield.Imaging;
+namespace SafeSnap.Imaging;
 
 /// <summary>
 /// Averages rectangular blocks of a BGRA32 buffer. Blocks are aligned to the

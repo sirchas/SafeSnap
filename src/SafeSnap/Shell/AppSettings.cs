@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace ShotShield;
+namespace SafeSnap;
 
 internal static class AppSettings
 {

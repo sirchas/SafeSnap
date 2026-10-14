@@ -3,7 +3,7 @@ using System.Drawing.Imaging;
 using DrawingBitmap = System.Drawing.Bitmap;
 using DrawingPixelFormat = System.Drawing.Imaging.PixelFormat;
 
-namespace ShotShield.Imaging;
+namespace SafeSnap.Imaging;
 
 public static class ImageUtility
 {

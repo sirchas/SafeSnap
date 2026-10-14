@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
-    <RootNamespace>ShotShield.Tests</RootNamespace>
+    <RootNamespace>SafeSnap.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ShotShield\ShotShield.csproj" />
+    <ProjectReference Include="..\..\src\SafeSnap\SafeSnap.csproj" />
   </ItemGroup>
 
 </Project>
