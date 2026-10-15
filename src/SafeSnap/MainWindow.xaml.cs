@@ -87,7 +87,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
-        if (!_screenshotMode && !_exitRequested)
+        if (SafeSnap.Shell.TrayPolicy.ShouldHideToTrayOnClose(_screenshotMode, _exitRequested))
         {
             e.Cancel = true;
             HideToTray();
@@ -95,6 +95,17 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         base.OnClosing(e);
+    }
+
+    protected override void OnStateChanged(EventArgs e)
+    {
+        base.OnStateChanged(e);
+        if (SafeSnap.Shell.TrayPolicy.ShouldHideToTrayOnStateChange(
+                WindowState == WindowState.Minimized, _screenshotMode, _exitRequested, _captureInProgress))
+        {
+            // Minimize behaves like X: hide to the tray and drop the taskbar button.
+            HideToTray();
+        }
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)

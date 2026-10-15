@@ -26,6 +26,11 @@
 
 Sharing a screenshot in a ticket, chat, or email often means exposing things you shouldn't: names, account numbers, email addresses, internal hostnames. SafeSnap makes it a two-second job: **snip, drag a box over the sensitive part, copy.** The pixelation is burned into the image, so the hidden text can't be recovered.
 
+## Why it matters: Data Loss Prevention (DLP)
+
+Screenshots are one of the easiest ways for sensitive data to leak. A quick capture for a ticket, chat or email can carry patient names and other PHI/PII, credentials and tokens, internal hostnames and IP addresses, or customer email addresses. Once shared, it gets forwarded, attached to tickets, indexed in chat history and stored indefinitely, far outside the systems built to protect that data. In regulated environments such as HIPAA, GDPR and PCI DSS, a single careless screenshot can become a reportable incident.
+
+SafeSnap was built to be the path of least resistance. Capturing, pixelating, highlighting and redacting take seconds, all in one window, so doing the safe thing is also the easiest thing. Pixelation is destructive and everything stays on your machine, so what you share contains only what you meant to share.
 ## Features
 
 - 🖼️ **Region capture like Snipping Tool.** Freezes all monitors, dims the screen, and lets you drag a selection with crosshair guides and a live pixel-size readout. Handles multiple monitors and mixed DPI scaling (per-monitor DPI aware).
@@ -49,10 +54,10 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 
 | File | What it is |
 |---|---|
-| `SafeSnap-Setup-1.1.1.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
-| `SafeSnap-1.1.1-portable-win-x64.exe` | Portable single file. No install; just run it. |
-| `SafeSnap-Setup-1.1.1.zip` | The installer in a zip (with a short README.txt). |
-| `SafeSnap-1.1.1-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
+| `SafeSnap-Setup-1.1.2.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
+| `SafeSnap-1.1.2-portable-win-x64.exe` | Portable single file. No install; just run it. |
+| `SafeSnap-Setup-1.1.2.zip` | The installer in a zip (with a short README.txt). |
+| `SafeSnap-1.1.2-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
@@ -77,7 +82,7 @@ Both are self-contained (no .NET install required). Windows 10/11 x64.
 
 ### Tray behavior
 
-Closing the window (✕) hides SafeSnap to the system tray so the hotkey stays available. **Double-click** the tray icon to reopen it. **Right-click** gives *New Capture*, *Open*, and *Exit*. Launching SafeSnap again brings up the existing window.
+Closing (✕) or minimizing the window hides SafeSnap to the system tray so the hotkey stays available. **Double-click** the tray icon to reopen it. **Right-click** gives *New Capture*, *Open*, and *Exit*. Launching SafeSnap again brings up the existing window.
 
 ## Privacy
 

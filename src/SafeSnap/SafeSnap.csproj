@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -15,7 +15,7 @@
     <AssemblyName>SafeSnap</AssemblyName>
     <Product>SafeSnap</Product>
     <AssemblyTitle>SafeSnap</AssemblyTitle>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <Description>SafeSnap captures the desktop, pixelates sensitive regions, then copies or saves a PNG.</Description>
   </PropertyGroup>
 
