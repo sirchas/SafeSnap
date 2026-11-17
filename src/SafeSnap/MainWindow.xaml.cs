@@ -65,6 +65,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         {
             _trayPromotionTimer?.Stop();
             App.ActivationRequested -= ActivateFromExternalRequest;
+            App.ExitRequested -= ExitFromTray;
             _toastHideTimer?.Stop();
             _hotkey?.Dispose();
             _hotkey = null;
@@ -105,6 +106,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         _tray = new TrayIcon(RestoreMainWindow, () => _ = BeginCaptureAsync(), ExitFromTray);
         StartTrayPromotion();
         App.ActivationRequested += ActivateFromExternalRequest;
+        App.ExitRequested += ExitFromTray;
         App.StartActivationListener();
     }
 
@@ -771,6 +773,9 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         _hotkey?.Dispose();
         _hotkey = null;
         Close();
+
+        // A capture overlay or dialog may still be open; make sure the process really ends.
+        Application.Current?.Shutdown(0);
     }
 
     internal void ActivateFromExternalRequest()

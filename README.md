@@ -58,10 +58,10 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 
 | File | What it is |
 |---|---|
-| `SafeSnap-Setup-1.2.1.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, an optional Desktop icon, a Startup shortcut so SafeSnap waits in the tray after you sign in (ticked by default, easy to untick), and an uninstaller. |
-| `SafeSnap-1.2.1-portable-win-x64.exe` | Portable single file. No install; just run it. |
-| `SafeSnap-Setup-1.2.1.zip` | The installer in a zip (with a short README.txt). |
-| `SafeSnap-1.2.1-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
+| `SafeSnap-Setup-1.2.2.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, an optional Desktop icon, a Startup shortcut so SafeSnap waits in the tray after you sign in (ticked by default, easy to untick), and an uninstaller. Closes a running SafeSnap for you and relaunches the new version when it's done. |
+| `SafeSnap-1.2.2-portable-win-x64.exe` | Portable single file. No install; just run it. |
+| `SafeSnap-Setup-1.2.2.zip` | The installer in a zip (with a short README.txt). |
+| `SafeSnap-1.2.2-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
@@ -88,6 +88,8 @@ Both are self-contained (no .NET install required). Windows 10/11 x64.
 ### Tray behavior
 
 Closing (✕) or minimizing the window hides SafeSnap to the system tray so the hotkey stays available. **Double-click** the tray icon to reopen it. **Right-click** gives *New Capture*, *Open*, and *Exit*. Launching SafeSnap again brings up the existing window.
+
+**Installing over a running copy.** No need to quit SafeSnap first. The installer (and uninstaller) asks any running SafeSnap, including one sitting in the tray, to exit before it touches files, and lets Windows close it if it doesn't, so there's no reboot. (Coming from 1.2.1, the installer may show a "close applications" page once with auto-close already picked; click Next.) When it finishes, *Launch SafeSnap* on the last page is ticked; a silent install (`/VERYSILENT`) relaunches it quietly in the tray.
 
 **Start with Windows.** The installer's *Start SafeSnap in the tray when I sign in to Windows* option (on by default) adds a Startup shortcut that runs `SafeSnap.exe --tray`: no window pops up, the tray icon and `Ctrl+Shift+S` are just ready. Untick it during setup, or delete the shortcut from `shell:startup` later; uninstalling removes it. The portable exe never adds itself to startup, but you can make your own shortcut with `--tray` if you like.
 

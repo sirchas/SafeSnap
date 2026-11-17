@@ -2,6 +2,12 @@
 
 SafeSnap is a personal side project, so this log stays short and plain.
 
+## 1.2.2 (2026-11-17)
+
+- **Installer closes SafeSnap for you.** Before copying files (and before uninstalling), setup asks any running SafeSnap to exit cleanly, including one in the tray or started with `--tray`. If something is still holding the exe, Windows' Restart Manager closes it. No reboot prompt, and silent installs never ask. Upgrading from 1.2.1 (which can't take the exit request) may show the "close applications" page once, with auto-close already selected; just click Next. No shell commands are used.
+- **And starts it again.** *Launch SafeSnap* on the Finish page is ticked by default and opens the window. Silent installs and upgrades relaunch SafeSnap in the tray.
+- Tray **Exit** now always ends the process, even if a capture overlay or dialog was still open.
+
 ## 1.2.1 (2026-11-17)
 
 - **Clear now clears everything.** **Clear** wipes the screenshot out of SafeSnap (image, annotations and undo/redo history) and returns to the start screen, as well as emptying the clipboard. Auto-copy has nothing left to copy, so the clipboard stays empty until your next capture.

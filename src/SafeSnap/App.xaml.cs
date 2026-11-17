@@ -7,13 +7,20 @@ public partial class App : Application
     public const string SingleInstanceMutexName = "SafeSnap.SingleInstance";
     private const string ActivateEventName = "SafeSnap.SingleInstance.Activate";
 
+    // The installer and uninstaller set this to ask a running SafeSnap to exit cleanly
+    // (closing the window only hides it to the tray). Keep in sync with installer\SafeSnap.iss.
+    public const string ExitEventName = "SafeSnap.SingleInstance.Exit";
+
     private static Mutex? _instanceMutex;
     private static EventWaitHandle? _activateEvent;
+    private static EventWaitHandle? _exitEvent;
     private static bool _ownsInstanceMutex;
     private static volatile bool _listenForActivation;
     private static int _listenerStarted;
 
     public static event Action? ActivationRequested;
+
+    public static event Action? ExitRequested;
 
     static App()
     {
@@ -85,6 +92,15 @@ public partial class App : Application
             // The listener is exiting with the process.
         }
 
+        try
+        {
+            _exitEvent?.Set();
+        }
+        catch (ObjectDisposedException)
+        {
+            // The listener is exiting with the process.
+        }
+
         ReleaseInstanceMutex();
         base.OnExit(e);
     }
@@ -113,6 +129,7 @@ public partial class App : Application
     private static bool TryBecomePrimaryInstance()
     {
         _activateEvent = new EventWaitHandle(false, EventResetMode.ManualReset, ActivateEventName);
+        _exitEvent = new EventWaitHandle(false, EventResetMode.ManualReset, ExitEventName);
         _instanceMutex = new Mutex(false, SingleInstanceMutexName);
         try
         {
@@ -146,6 +163,8 @@ public partial class App : Application
         _instanceMutex = null;
         _activateEvent?.Dispose();
         _activateEvent = null;
+        _exitEvent?.Dispose();
+        _exitEvent = null;
     }
 
     private static void ReleaseInstanceMutex()
@@ -168,21 +187,26 @@ public partial class App : Application
         _instanceMutex = null;
         _activateEvent?.Dispose();
         _activateEvent = null;
+        _exitEvent?.Dispose();
+        _exitEvent = null;
     }
 
     private static void ListenForActivation()
     {
         var handle = _activateEvent;
-        if (handle is null)
+        var exit = _exitEvent;
+        if (handle is null || exit is null)
         {
             return;
         }
 
+        var handles = new WaitHandle[] { handle, exit };
         while (_listenForActivation)
         {
+            int signaled;
             try
             {
-                handle.WaitOne();
+                signaled = WaitHandle.WaitAny(handles);
             }
             catch (ObjectDisposedException)
             {
@@ -191,6 +215,23 @@ public partial class App : Application
 
             if (!_listenForActivation)
             {
+                return;
+            }
+
+            if (signaled == 1)
+            {
+                // Installer/uninstaller asked us to quit. Stop listening and exit like tray > Exit.
+                _listenForActivation = false;
+                Current?.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (ExitRequested is null)
+                    {
+                        Current?.Shutdown(0);
+                        return;
+                    }
+
+                    ExitRequested.Invoke();
+                }));
                 return;
             }
 
