@@ -32,6 +32,10 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     private bool _arrangingShadow;
     private bool _exitRequested;
     private EditorTool _tool = EditorTool.Pixelate;
+    private bool _autoCopy = true;
+    private uint? _clipboardSequenceAfterCopy;
+    private DispatcherTimer? _trayPromotionTimer;
+    private int _trayPromotionAttempts;
 
     public MainWindow()
     {
@@ -49,9 +53,17 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
             Wpf.Ui.Appearance.SystemThemeWatcher.Watch(this, Wpf.Ui.Controls.WindowBackdropType.Mica);
         }
 
+        _autoCopy = !_screenshotMode && AppSettings.IsAutoCopyEnabled();
+        // Screenshot runs never touch the clipboard but still show the default (on) state.
+        AutoCopySwitch.IsChecked = _screenshotMode || _autoCopy;
+        AutoCopySwitch.Checked += AutoCopySwitch_Changed;
+        AutoCopySwitch.Unchecked += AutoCopySwitch_Changed;
+
         ContentRendered += OnContentRendered;
+        Activated += (_, _) => UpdateChrome();
         Closed += (_, _) =>
         {
+            _trayPromotionTimer?.Stop();
             App.ActivationRequested -= ActivateFromExternalRequest;
             _toastHideTimer?.Stop();
             _hotkey?.Dispose();
@@ -81,6 +93,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         _tray = new TrayIcon(RestoreMainWindow, () => _ = BeginCaptureAsync(), ExitFromTray);
+        StartTrayPromotion();
         App.ActivationRequested += ActivateFromExternalRequest;
         App.StartActivationListener();
     }
@@ -679,6 +692,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
                 try
                 {
                     SetImage(ImageUtility.Crop(shot, rect), resetHistory: true);
+                    AutoCopyCurrent();
                 }
                 catch (Exception ex)
                 {
@@ -713,6 +727,30 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
         AppSettings.MarkTrayHintShown();
         _tray.ShowFirstHint();
+    }
+
+    private void StartTrayPromotion()
+    {
+        // Windows 11 registers a new tray icon a moment after it is added, then hides it in the
+        // overflow (^). Ask once to be shown on the taskbar, retrying until the entry exists.
+        _trayPromotionAttempts = 0;
+        _trayPromotionTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1500) };
+        _trayPromotionTimer.Tick += (_, _) =>
+        {
+            _trayPromotionAttempts++;
+            var outcome = SafeSnap.Shell.TrayPromotion.TryPromote(Environment.ProcessPath);
+            if (outcome == SafeSnap.Shell.TrayPromotion.Outcome.Promoted)
+            {
+                _tray?.Refresh();
+            }
+
+            if (outcome != SafeSnap.Shell.TrayPromotion.Outcome.NotRegisteredYet || _trayPromotionAttempts >= 8)
+            {
+                _trayPromotionTimer?.Stop();
+                _trayPromotionTimer = null;
+            }
+        };
+        _trayPromotionTimer.Start();
     }
 
     private void ExitFromTray()
@@ -1094,6 +1132,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         _history.PushUndo(snapshot);
         CanvasImage.Source = null;
         CanvasImage.Source = _current;
+        AutoCopyCurrent();
         UpdateChrome();
     }
 
@@ -1275,6 +1314,86 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private void SaveButton_Click(object sender, RoutedEventArgs e) => SaveImage();
 
+    private void ClearClipboardButton_Click(object sender, RoutedEventArgs e) => ClearClipboard();
+
+    private void AutoCopySwitch_Changed(object sender, RoutedEventArgs e)
+    {
+        var enabled = AutoCopySwitch.IsChecked == true;
+        if (_screenshotMode || enabled == _autoCopy)
+        {
+            return;
+        }
+
+        _autoCopy = enabled;
+        AppSettings.SetAutoCopy(enabled);
+        if (enabled && _current is not null)
+        {
+            AutoCopyCurrent();
+            ShowToast("Auto-copy on · copied to clipboard");
+        }
+        else
+        {
+            ShowToast(enabled ? "Auto-copy on" : "Auto-copy off");
+        }
+
+        UpdateChrome();
+    }
+
+    /// <summary>Puts the current image on the clipboard after an action when auto-copy is on.</summary>
+    private void AutoCopyCurrent()
+    {
+        if (!SafeSnap.Shell.ClipboardPolicy.ShouldAutoCopy(_autoCopy, _screenshotMode, _current is not null))
+        {
+            return;
+        }
+
+        if (TryClipboard(() => ImageUtility.CopyToClipboard(_current!)))
+        {
+            _clipboardSequenceAfterCopy = NativeMethods.GetClipboardSequenceNumber();
+        }
+        else
+        {
+            // Another app had the clipboard open. Don't interrupt editing with a dialog.
+            _clipboardSequenceAfterCopy = null;
+            StatusText.Text = "Couldn't auto-copy (clipboard busy). Press Ctrl+C to copy.";
+            return;
+        }
+
+        UpdateChrome();
+    }
+
+    private void ClearClipboard()
+    {
+        if (TryClipboard(ImageUtility.ClearClipboard))
+        {
+            _clipboardSequenceAfterCopy = null;
+            UpdateChrome();
+            ShowToast("Clipboard cleared");
+            return;
+        }
+
+        MessageBox.Show(this, "The clipboard is in use by another app. Try again in a moment.", "SafeSnap", MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    /// <summary>The clipboard can be briefly locked by another process; retry a few times.</summary>
+    private static bool TryClipboard(Action action)
+    {
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            try
+            {
+                action();
+                return true;
+            }
+            catch (ExternalException)
+            {
+                System.Threading.Thread.Sleep(40);
+            }
+        }
+
+        return false;
+    }
+
     private void Undo()
     {
         if (_current is null)
@@ -1289,6 +1408,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         SetImage(restored, resetHistory: false);
+        AutoCopyCurrent();
     }
 
     private void Redo()
@@ -1305,6 +1425,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         }
 
         SetImage(restored, resetHistory: false);
+        AutoCopyCurrent();
     }
 
     private void CopyImage()
@@ -1317,6 +1438,8 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         try
         {
             ImageUtility.CopyToClipboard(_current);
+            _clipboardSequenceAfterCopy = NativeMethods.GetClipboardSequenceNumber();
+            UpdateChrome();
             ShowToast("Copied to clipboard");
         }
         catch (Exception ex)
@@ -1475,7 +1598,14 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
         var zoom = CurrentZoomPercent();
         var size = $"{_current!.PixelWidth} × {_current.PixelHeight} px";
-        StatusText.Text = zoom > 0 ? $"{size}  ·  {zoom}%" : size;
+        var text = zoom > 0 ? $"{size}  ·  {zoom}%" : size;
+        if (!_screenshotMode && SafeSnap.Shell.ClipboardPolicy.ClipboardStillOurs(
+                _clipboardSequenceAfterCopy, NativeMethods.GetClipboardSequenceNumber()))
+        {
+            text += "  ·  On clipboard";
+        }
+
+        StatusText.Text = text;
     }
 
     private enum EditorTool

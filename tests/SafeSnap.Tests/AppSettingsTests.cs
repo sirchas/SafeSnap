@@ -93,6 +93,44 @@ public class AppSettingsTests : IDisposable
     }
 
     [Fact]
+    public void AutoCopy_DefaultsToOn()
+    {
+        Assert.False(File.Exists(AppSettings.FilePath));
+        Assert.True(AppSettings.IsAutoCopyEnabled());
+
+        // Settings files from 1.1.x have no autoCopy key.
+        File.WriteAllText(AppSettings.FilePath, "{\n  \"trayHintShown\": true,\n  \"pixelateTipShown\": true\n}\n");
+        Assert.True(AppSettings.IsAutoCopyEnabled());
+
+        File.WriteAllText(AppSettings.FilePath, "{\n  \"autoCopy\": \"nope\"\n}\n");
+        Assert.True(AppSettings.IsAutoCopyEnabled());
+
+        File.WriteAllText(AppSettings.FilePath, "not json");
+        Assert.True(AppSettings.IsAutoCopyEnabled());
+        AssertRealSettingsUnchanged();
+    }
+
+    [Fact]
+    public void AutoCopy_OffIsSavedAndKeepsOtherSettings()
+    {
+        AppSettings.MarkTrayHintShown();
+        AppSettings.SetAutoCopy(false);
+
+        Assert.False(AppSettings.IsAutoCopyEnabled());
+        Assert.True(AppSettings.HasShownTrayHint());
+        Assert.Contains("\"autoCopy\": false", File.ReadAllText(AppSettings.FilePath), StringComparison.Ordinal);
+
+        // Marking a hint later must not flip the toggle back on.
+        AppSettings.MarkPixelateTipShown();
+        Assert.False(AppSettings.IsAutoCopyEnabled());
+
+        AppSettings.SetAutoCopy(true);
+        Assert.True(AppSettings.IsAutoCopyEnabled());
+        Assert.True(AppSettings.HasShownPixelateTip());
+        AssertRealSettingsUnchanged();
+    }
+
+    [Fact]
     public void IsolatedMode_DoesNotReadOrWriteTheSettingsFile()
     {
         File.WriteAllText(AppSettings.FilePath, "{\n  \"pixelateTipShown\": true,\n  \"trayHintShown\": true\n}\n");

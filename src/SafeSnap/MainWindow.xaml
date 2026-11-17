@@ -482,6 +482,13 @@
                     Style="{StaticResource ToolbarButtonStyle}"
                     ToolTip="Copy as bitmap and PNG (Ctrl+C)" />
                 <ui:Button
+                    x:Name="ClearClipboardButton"
+                    Click="ClearClipboardButton_Click"
+                    Content="Clear"
+                    Icon="{ui:SymbolIcon Broom24}"
+                    Style="{StaticResource ToolbarButtonStyle}"
+                    ToolTip="Clear the clipboard" />
+                <ui:Button
                     x:Name="SaveButton"
                     Click="SaveButton_Click"
                     Content="Save"
@@ -760,11 +767,29 @@
             Background="{DynamicResource ControlFillColorDefaultBrush}"
             BorderBrush="{DynamicResource ControlElevationBorderBrush}"
             BorderThickness="0,1,0,0">
-            <TextBlock
-                x:Name="StatusText"
-                FontSize="12"
-                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                Text="Ready" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    x:Name="StatusText"
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="Ready"
+                    TextTrimming="CharacterEllipsis" />
+                <ui:ToggleSwitch
+                    x:Name="AutoCopySwitch"
+                    Grid.Column="1"
+                    Margin="12,-4,0,-4"
+                    VerticalAlignment="Center"
+                    Content="Auto-copy"
+                    FontSize="12"
+                    IsChecked="True"
+                    ToolTip="Put the image on the clipboard after every capture and edit" />
+            </Grid>
         </Border>
     </Grid>
 </ui:FluentWindow>

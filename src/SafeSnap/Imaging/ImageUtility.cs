@@ -150,6 +150,14 @@ public static class ImageUtility
         _clipboardPng = png;
     }
 
+    /// <summary>Empties the clipboard, whoever put the item there.</summary>
+    public static void ClearClipboard()
+    {
+        Clipboard.Clear();
+        _clipboardPng?.Dispose();
+        _clipboardPng = null;
+    }
+
     public static string PicturesFolder()
     {
         var folder = Path.Combine(

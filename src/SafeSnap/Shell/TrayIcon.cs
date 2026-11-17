@@ -35,9 +35,24 @@ internal sealed class TrayIcon : IDisposable
         }
 
         _icon.BalloonTipTitle = "SafeSnap";
-        _icon.BalloonTipText = "SafeSnap is still running. Double-click this icon to open it.";
+        _icon.BalloonTipText = "SafeSnap is still running here in the tray. Double-click the icon to open it, or right-click for Open and Exit.";
         _icon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
         _icon.ShowBalloonTip(4000);
+    }
+
+    /// <summary>
+    /// Removes and re-adds the icon so Explorer re-reads its taskbar placement
+    /// (used right after SafeSnap asks Windows 11 to show it outside the overflow).
+    /// </summary>
+    public void Refresh()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _icon.Visible = false;
+        _icon.Visible = true;
     }
 
     public void Dispose()

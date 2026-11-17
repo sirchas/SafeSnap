@@ -6,6 +6,7 @@ internal static class AppSettings
 {
     private const string TrayHintKey = "trayHintShown";
     private const string PixelateTipKey = "pixelateTipShown";
+    private const string AutoCopyKey = "autoCopy";
 
     private static readonly string DefaultFilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -62,6 +63,19 @@ internal static class AppSettings
         Save(settings);
     }
 
+    /// <summary>Auto-copy is on unless the user has turned it off.</summary>
+    public static bool IsAutoCopyEnabled()
+    {
+        return Load().AutoCopy;
+    }
+
+    public static void SetAutoCopy(bool enabled)
+    {
+        var settings = Load();
+        settings.AutoCopy = enabled;
+        Save(settings);
+    }
+
     private static SettingsModel Load()
     {
         if (_isolatedFromDisk)
@@ -82,7 +96,8 @@ internal static class AppSettings
             return new SettingsModel
             {
                 TrayHintShown = ReadTrue(root, TrayHintKey),
-                PixelateTipShown = ReadTrue(root, PixelateTipKey)
+                PixelateTipShown = ReadTrue(root, PixelateTipKey),
+                AutoCopy = ReadBool(root, AutoCopyKey, defaultValue: true)
             };
         }
         catch (Exception)
@@ -112,14 +127,15 @@ internal static class AppSettings
                 new Dictionary<string, bool>
                 {
                     [TrayHintKey] = settings.TrayHintShown,
-                    [PixelateTipKey] = settings.PixelateTipShown
+                    [PixelateTipKey] = settings.PixelateTipShown,
+                    [AutoCopyKey] = settings.AutoCopy
                 },
                 new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(path, json + Environment.NewLine);
         }
         catch (Exception)
         {
-            // A failed write only means a one-time hint may appear again.
+            // A failed write only means a one-time hint may appear again or a toggle resets.
         }
     }
 
@@ -130,10 +146,27 @@ internal static class AppSettings
             && value.ValueKind == JsonValueKind.True;
     }
 
+    private static bool ReadBool(JsonElement root, string name, bool defaultValue)
+    {
+        if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty(name, out var value))
+        {
+            return defaultValue;
+        }
+
+        return value.ValueKind switch
+        {
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            _ => defaultValue
+        };
+    }
+
     private sealed class SettingsModel
     {
         public bool TrayHintShown { get; set; }
 
         public bool PixelateTipShown { get; set; }
+
+        public bool AutoCopy { get; set; } = true;
     }
 }

@@ -1,5 +1,5 @@
 ﻿#define AppName "SafeSnap"
-#define AppVersion "1.1.2"
+#define AppVersion "1.2.0"
 #define AppPublisher "Charles Wells"
 #define AppExe "SafeSnap.exe"
 
