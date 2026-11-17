@@ -1,5 +1,5 @@
 ﻿#define AppName "SafeSnap"
-#define AppVersion "1.2.0"
+#define AppVersion "1.2.1"
 #define AppPublisher "Charles Wells"
 #define AppExe "SafeSnap.exe"
 
@@ -34,6 +34,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "startupicon"; Description: "Start SafeSnap in the tray when I sign in to Windows"; GroupDescription: "Startup:"
 
 [Files]
 Source: "..\publish\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
@@ -41,6 +42,8 @@ Source: "..\publish\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopicon
+; Startup shortcut: launches hidden in the tray. Inno removes it on uninstall.
+Name: "{autostartup}\{#AppName}"; Filename: "{app}\{#AppExe}"; Parameters: "--tray"; Comment: "Start SafeSnap in the tray"; Tasks: startupicon
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent

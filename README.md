@@ -41,7 +41,7 @@ SafeSnap was built to be the path of least resistance. Capturing, pixelating, hi
 - 🖍 **Highlight & Arrow tools.** Switch tools in the toolbar to drop a semi-transparent yellow highlight or a red arrow (drag sets direction and length).
 - ↩️ **Undo / Redo** for every edit. All annotations are baked into the copied/saved image.
 - 📋 **Auto-copy (on by default).** After every capture, pixelate, highlight, arrow, undo and redo, the current image is already on the clipboard as a real bitmap plus PNG, so it pastes cleanly into Outlook, Teams, Word, Slack, and more. Turn it off with the **Auto-copy** switch in the status bar; SafeSnap remembers your choice. **Copy** (`Ctrl+C`) still works any time.
-- 🧹 **Clear clipboard.** One click on **Clear** empties the clipboard so a redacted (or unredacted) screenshot doesn't linger there.
+- 🧹 **Clear.** One click on **Clear** wipes the screenshot out of SafeSnap (image, edits and undo history, back to the start screen) and empties the clipboard, so nothing lingers once you've shared it.
 - 💾 **Save as PNG** to `Pictures\SafeSnap` with a timestamped filename.
 - ⌨️ **Global hotkey** `Ctrl+Shift+S` works from anywhere, even when SafeSnap is in the tray.
 - ⏱️ **Capture delay** (0 / 3 / 5 s) for menus and tooltips.
@@ -58,10 +58,10 @@ Grab the latest build from the **[Releases page](https://github.com/sirchas/Safe
 
 | File | What it is |
 |---|---|
-| `SafeSnap-Setup-1.2.0.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, optional Desktop icon, and an uninstaller. |
-| `SafeSnap-1.2.0-portable-win-x64.exe` | Portable single file. No install; just run it. |
-| `SafeSnap-Setup-1.2.0.zip` | The installer in a zip (with a short README.txt). |
-| `SafeSnap-1.2.0-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
+| `SafeSnap-Setup-1.2.1.exe` | **Recommended.** Per-user installer (no admin needed). Adds a Start Menu shortcut, an optional Desktop icon, a Startup shortcut so SafeSnap waits in the tray after you sign in (ticked by default, easy to untick), and an uninstaller. |
+| `SafeSnap-1.2.1-portable-win-x64.exe` | Portable single file. No install; just run it. |
+| `SafeSnap-Setup-1.2.1.zip` | The installer in a zip (with a short README.txt). |
+| `SafeSnap-1.2.1-portable-win-x64.zip` | The portable exe in a zip with LICENSE and README.txt. Extract anywhere and run. |
 
 Both are self-contained (no .NET install required). Windows 10/11 x64.
 
@@ -73,7 +73,7 @@ Both are self-contained (no .NET install required). Windows 10/11 x64.
 2. Drag a region on the frozen screen. `Esc` cancels.
 3. Drag over anything sensitive; it's pixelated instantly. Pick **Highlight** or **Arrow** in the toolbar to call things out instead (arrows: drag from start to end).
 4. Paste it wherever it's going. With Auto-copy on, the clipboard always holds the latest version (the status bar shows *On clipboard*). Or **Save** a PNG.
-5. Done sharing? Click **Clear** to empty the clipboard.
+5. Done sharing? Click **Clear**: the screenshot, its edits and the clipboard are all wiped and you're back at the start screen.
 
 ### Keyboard shortcuts
 
@@ -88,6 +88,8 @@ Both are self-contained (no .NET install required). Windows 10/11 x64.
 ### Tray behavior
 
 Closing (✕) or minimizing the window hides SafeSnap to the system tray so the hotkey stays available. **Double-click** the tray icon to reopen it. **Right-click** gives *New Capture*, *Open*, and *Exit*. Launching SafeSnap again brings up the existing window.
+
+**Start with Windows.** The installer's *Start SafeSnap in the tray when I sign in to Windows* option (on by default) adds a Startup shortcut that runs `SafeSnap.exe --tray`: no window pops up, the tray icon and `Ctrl+Shift+S` are just ready. Untick it during setup, or delete the shortcut from `shell:startup` later; uninstalling removes it. The portable exe never adds itself to startup, but you can make your own shortcut with `--tray` if you like.
 
 Windows 11 normally hides new tray icons under the **^** overflow, which made SafeSnap look like it had vanished after closing. From 1.2.0, SafeSnap asks Windows once to show its icon on the taskbar. If you'd rather tuck it away, turn it off in **Settings > Personalization > Taskbar > Other system tray icons** and SafeSnap will leave that choice alone.
 

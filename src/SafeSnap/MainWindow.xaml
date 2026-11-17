@@ -482,12 +482,12 @@
                     Style="{StaticResource ToolbarButtonStyle}"
                     ToolTip="Copy as bitmap and PNG (Ctrl+C)" />
                 <ui:Button
-                    x:Name="ClearClipboardButton"
-                    Click="ClearClipboardButton_Click"
+                    x:Name="ClearButton"
+                    Click="ClearButton_Click"
                     Content="Clear"
                     Icon="{ui:SymbolIcon Broom24}"
                     Style="{StaticResource ToolbarButtonStyle}"
-                    ToolTip="Clear the clipboard" />
+                    ToolTip="Clear the screenshot and the clipboard" />
                 <ui:Button
                     x:Name="SaveButton"
                     Click="SaveButton_Click"

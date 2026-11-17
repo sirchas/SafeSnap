@@ -31,6 +31,9 @@ public partial class App : Application
 
     public static string? ScreenshotTipPath { get; private set; }
 
+    /// <summary>True when launched with --tray (the installer's Startup shortcut): start hidden in the tray.</summary>
+    public static bool StartInTray { get; private set; }
+
     public static bool IsScreenshotMode =>
         !string.IsNullOrWhiteSpace(ScreenshotPath)
         || !string.IsNullOrWhiteSpace(ScreenshotEmptyPath)
@@ -39,6 +42,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         ReadScreenshotArgs(e.Args);
+        StartInTray = SafeSnap.Shell.LaunchOptions.HasTrayFlag(e.Args);
         if (IsScreenshotMode)
         {
             // Screenshot runs must not take the interactive mutex, leave a tray process behind,
@@ -48,13 +52,25 @@ public partial class App : Application
         }
         else if (!TryBecomePrimaryInstance())
         {
-            SignalPrimaryInstance();
+            // A logon (--tray) launch must not pop up a copy that is already running.
+            SignalPrimaryInstance(activate: SafeSnap.Shell.LaunchOptions.ShouldActivateExistingInstance(StartInTray));
             Environment.Exit(0);
             return;
         }
 
         Wpf.Ui.Appearance.ApplicationThemeManager.ApplySystemTheme();
         base.OnStartup(e);
+
+        var window = new MainWindow();
+        MainWindow = window;
+        if (StartInTray && !IsScreenshotMode)
+        {
+            window.StartHiddenInTray();
+        }
+        else
+        {
+            window.Show();
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -110,16 +126,19 @@ public partial class App : Application
         return _ownsInstanceMutex;
     }
 
-    private static void SignalPrimaryInstance()
+    private static void SignalPrimaryInstance(bool activate)
     {
-        try
+        if (activate)
         {
-            using var handle = EventWaitHandle.OpenExisting(ActivateEventName);
-            handle.Set();
-        }
-        catch (WaitHandleCannotBeOpenedException)
-        {
-            _activateEvent?.Set();
+            try
+            {
+                using var handle = EventWaitHandle.OpenExisting(ActivateEventName);
+                handle.Set();
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                _activateEvent?.Set();
+            }
         }
 
         _ownsInstanceMutex = false;

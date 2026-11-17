@@ -75,6 +75,16 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         ApplyToolChrome();
     }
 
+    /// <summary>
+    /// Logon start (--tray): create the window handle so the hotkey and tray icon exist,
+    /// but keep the window hidden until the user opens it from the tray or the hotkey.
+    /// </summary>
+    internal void StartHiddenInTray()
+    {
+        ShowInTaskbar = false;
+        new WindowInteropHelper(this).EnsureHandle();
+    }
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -1314,7 +1324,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 
     private void SaveButton_Click(object sender, RoutedEventArgs e) => SaveImage();
 
-    private void ClearClipboardButton_Click(object sender, RoutedEventArgs e) => ClearClipboard();
+    private void ClearButton_Click(object sender, RoutedEventArgs e) => ClearAll();
 
     private void AutoCopySwitch_Changed(object sender, RoutedEventArgs e)
     {
@@ -1362,17 +1372,39 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         UpdateChrome();
     }
 
-    private void ClearClipboard()
+    /// <summary>
+    /// Clear: empty the editor (image, annotations, undo/redo) back to the start screen,
+    /// then empty the clipboard. Nothing is re-copied afterwards because there is no image.
+    /// </summary>
+    private void ClearAll()
     {
+        ClearCanvas();
         if (TryClipboard(ImageUtility.ClearClipboard))
         {
-            _clipboardSequenceAfterCopy = null;
-            UpdateChrome();
-            ShowToast("Clipboard cleared");
+            ShowToast("Cleared");
             return;
         }
 
-        MessageBox.Show(this, "The clipboard is in use by another app. Try again in a moment.", "SafeSnap", MessageBoxButton.OK, MessageBoxImage.Warning);
+        MessageBox.Show(this, "SafeSnap was cleared, but the clipboard is in use by another app. Click Clear again in a moment.", "SafeSnap", MessageBoxButton.OK, MessageBoxImage.Warning);
+    }
+
+    private void ClearCanvas()
+    {
+        _pixelDrag = false;
+        if (ImageHost.IsMouseCaptured)
+        {
+            ImageHost.ReleaseMouseCapture();
+        }
+
+        HideDragPreview();
+        HidePixelateTip();
+        _current = null;
+        _history.Clear();
+        _clipboardSequenceAfterCopy = null;
+        CanvasImage.Source = null;
+        ImageSlot.Visibility = Visibility.Collapsed;
+        EmptyState.Visibility = Visibility.Visible;
+        UpdateChrome();
     }
 
     /// <summary>The clipboard can be briefly locked by another process; retry a few times.</summary>

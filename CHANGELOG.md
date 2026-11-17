@@ -2,6 +2,12 @@
 
 SafeSnap is a personal side project, so this log stays short and plain.
 
+## 1.2.1 (2026-11-17)
+
+- **Clear now clears everything.** **Clear** wipes the screenshot out of SafeSnap (image, annotations and undo/redo history) and returns to the start screen, as well as emptying the clipboard. Auto-copy has nothing left to copy, so the clipboard stays empty until your next capture.
+- **Start with Windows.** The installer has a new *Start SafeSnap in the tray when I sign in to Windows* option, ticked by default. It adds a Startup shortcut that runs SafeSnap hidden in the tray (`--tray`), so the hotkey is ready without a window popping up. Uninstall removes it. The portable exe is unchanged.
+- `--tray` (also `--minimized`) starts SafeSnap in the tray. If SafeSnap is already running, a `--tray` launch stays quiet instead of opening the window.
+
 ## 1.2.0 (2026-11-17)
 
 - **Auto-copy, on by default.** The current image goes to the clipboard after every capture, pixelate, highlight, arrow, undo and redo, so the clipboard always holds the latest version. The status bar shows *On clipboard* while it does. Turn it off with the **Auto-copy** switch in the status bar; the choice is saved for next time.
